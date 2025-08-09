@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Sidebar } from "./(components)/Sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,11 +24,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full bg-gray-50">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen text-gray-900`}
       >
-        {children}
+        <div className="md:pl-64">
+          <Sidebar />
+          <div className="pb-24">{children}</div>
+        </div>
+        <div className="md:hidden">
+          {/* Mobile bottom nav */}
+          {/* @ts-expect-error Server Components cannot auto-detect client components here; dynamic import preferred later */}
+          {(await import("./(components)/BottomNav")).BottomNav()}
+        </div>
       </body>
     </html>
   );

@@ -1,0 +1,184 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum TimeMode {
+  timer
+  manual
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role     @default(VIEWER)
+  passwordHash  String?
+  createdAt     DateTime @default(now())
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  @@index([role])
+}
+
+model Project {
+  id        String   @id @default(cuid())
+  name      String
+  address   String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  journalEntries JournalEntry[]
+  timeEntries    TimeEntry[]
+
+  @@index([active])
+  @@index([name])
+}
+
+model Company {
+  id                 String   @id @default(cuid())
+  name               String   @unique
+  hourlyRateDefault  Decimal?
+  createdAt          DateTime @default(now())
+
+  people      Person[]
+  timeEntries TimeEntry[]
+
+  @@index([name])
+}
+
+model Person {
+  id          String   @id @default(cuid())
+  name        String
+  hourlyRate  Decimal?
+  companyId   String?
+  company     Company? @relation(fields: [companyId], references: [id])
+  createdAt   DateTime @default(now())
+
+  timeEntries TimeEntry[]
+
+  @@index([companyId])
+  @@index([name])
+}
+
+model JournalEntry {
+  id         String   @id @default(cuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id])
+  userId     String
+  author     User     @relation(fields: [userId], references: [id])
+  date       DateTime
+  title      String
+  notes      String?
+  tags       Json?
+  weather    Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  photos     Photo[]
+  timeEntries TimeEntry[]
+
+  @@index([projectId])
+  @@index([date])
+}
+
+model Photo {
+  id             String        @id @default(cuid())
+  journalEntryId String
+  journalEntry   JournalEntry  @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  url            String
+  caption        String?
+  createdAt      DateTime @default(now())
+
+  @@index([journalEntryId])
+}
+
+model TimeEntry {
+  id               String     @id @default(cuid())
+  projectId        String
+  project          Project    @relation(fields: [projectId], references: [id])
+  personId         String?
+  person           Person?    @relation(fields: [personId], references: [id])
+  companyId        String?
+  company          Company?   @relation(fields: [companyId], references: [id])
+  journalEntryId   String?
+  journalEntry     JournalEntry? @relation(fields: [journalEntryId], references: [id], onDelete: SetNull)
+  mode             TimeMode
+  date             DateTime
+  startAt          DateTime?
+  endAt            DateTime?
+  breakMinutes     Int?       @default(0)
+  durationMinutes  Int        @default(0)
+  notes            String?
+  createdAt        DateTime   @default(now())
+
+  timer            Timer?
+
+  @@index([projectId])
+  @@index([date])
+  @@index([personId])
+  @@index([companyId])
+}
+
+model Timer {
+  id          String    @id @default(cuid())
+  timeEntryId String    @unique
+  timeEntry   TimeEntry @relation(fields: [timeEntryId], references: [id], onDelete: Cascade)
+  startedAt   DateTime
+  stoppedAt   DateTime?
+}
+
+// NextAuth models (required by Prisma Adapter)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
