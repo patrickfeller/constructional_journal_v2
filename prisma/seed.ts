@@ -1,8 +1,11 @@
 /* eslint-disable no-console */
-import { db } from "../app/lib/db";
+import { db } from "@/lib/db";
+import bcrypt from "bcrypt";
 
 async function main() {
   // Basic seed: one user, a couple projects
+  const passwordHash = await bcrypt.hash("demo1234", 10);
+
   const user = await db.user.upsert({
     where: { email: "demo@example.com" },
     update: {},
@@ -10,6 +13,7 @@ async function main() {
       email: "demo@example.com",
       name: "Demo User",
       role: "OWNER",
+      passwordHash,
     },
   });
 

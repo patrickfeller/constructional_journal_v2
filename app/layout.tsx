@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "./(components)/Sidebar";
+import { BottomNav } from "./(components)/BottomNav";
+import { ThemeProvider } from "./(components)/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,19 +26,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full bg-gray-50">
+    <html lang="en" className="h-full" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen text-gray-900`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}
       >
-        <div className="md:pl-64">
-          <Sidebar />
-          <div className="pb-24">{children}</div>
-        </div>
-        <div className="md:hidden">
-          {/* Mobile bottom nav */}
-          {/* @ts-expect-error Server Components cannot auto-detect client components here; dynamic import preferred later */}
-          {(await import("./(components)/BottomNav")).BottomNav()}
-        </div>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="md:flex">
+            <Sidebar />
+            <div className="flex-1 min-w-0 pb-24">{children}</div>
+          </div>
+          <div className="md:hidden">
+            <BottomNav />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
