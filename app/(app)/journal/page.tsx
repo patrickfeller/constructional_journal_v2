@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { db } from "@/lib/db";
+export const dynamic = "force-dynamic";
 import { createJournalEntry } from "./actions";
 import { PhotoGrid } from "@/components/PhotoGrid";
 
