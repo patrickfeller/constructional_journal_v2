@@ -29,3 +29,9 @@ pnpm dev
 - prisma:migrate: apply migrations
 - prisma:generate: generate client
 - prisma:seed: seed demo data
+
+## ToDos:
+- add wetter API that add the current weather details for the journal entry
+- add change of name entries (people, companies,...)
+- FIX: delete projects didn't work
+- show Markdown possibility in jounal entries
