@@ -34,15 +34,14 @@ function PhotoItem({ url, alt }: { url: string; alt: string }) {
 
   return (
     <div className="relative aspect-square overflow-hidden rounded-md">
-      <Image
+        <Image
         src={url}
         alt={alt}
         fill
         sizes="(max-width: 640px) 33vw, 16vw"
         className="object-cover"
-        onLoad={() => { /* render once loaded; nothing needed */ }}
+          onLoad={() => { /* render once loaded; nothing needed */ }}
         onError={() => setErrored(true)}
-        unoptimized
       />
     </div>
   );

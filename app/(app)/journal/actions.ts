@@ -27,12 +27,15 @@ export async function createJournalEntry(formData: FormData): Promise<void> {
   const files = formData.getAll("photos").filter((f) => f instanceof File) as File[];
   const urls = files.length ? await saveFilesToPublicUploads(files) : [];
 
-  const demoUser = await db.user.findFirst({ where: { email: "demo@example.com" } });
-  const userId = demoUser?.id ?? undefined;
+  const user = await db.user.upsert({
+    where: { email: "demo@example.com" },
+    update: {},
+    create: { email: "demo@example.com", name: "Demo User", role: "OWNER" },
+  });
   await db.journalEntry.create({
     data: {
       projectId,
-      userId: userId!,
+      userId: user.id,
       date: new Date(date),
       title,
       notes: notes || null,
