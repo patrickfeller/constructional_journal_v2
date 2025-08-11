@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { revalidatePath } from "next/cache";
 
 const manualSchema = z.object({
   projectId: z.string().min(1),
@@ -13,7 +14,7 @@ const manualSchema = z.object({
   notes: z.string().optional().or(z.literal("")),
 });
 
-export async function createManualTime(formData: FormData) {
+export async function createManualTime(formData: FormData): Promise<void> {
   const parsed = manualSchema.safeParse({
     projectId: formData.get("projectId"),
     personId: formData.get("personId"),
@@ -23,7 +24,7 @@ export async function createManualTime(formData: FormData) {
     breakMinutes: formData.get("breakMinutes") ?? 0,
     notes: formData.get("notes") ?? undefined,
   });
-  if (!parsed.success) return { ok: false, error: "Invalid input" };
+  if (!parsed.success) return;
   const { projectId, personId, date, start, end, breakMinutes, notes } = parsed.data;
 
   const startAt = new Date(`${date}T${start}:00`);
@@ -43,7 +44,7 @@ export async function createManualTime(formData: FormData) {
       notes: notes || null,
     },
   });
-  return { ok: true };
+  revalidatePath("/time");
 }
 
 

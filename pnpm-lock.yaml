@@ -12,7 +12,7 @@ importers:
         specifier: ^2.10.0
         version: 2.10.0(@prisma/client@6.13.0(prisma@6.13.0(typescript@5.9.2))(typescript@5.9.2))
       '@prisma/client':
-        specifier: 6.13.0
+        specifier: latest
         version: 6.13.0(prisma@6.13.0(typescript@5.9.2))(typescript@5.9.2)
       '@radix-ui/react-dropdown-menu':
         specifier: ^2.1.15
@@ -44,6 +44,9 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      prisma:
+        specifier: latest
+        version: 6.13.0(typescript@5.9.2)
       react:
         specifier: 19.1.0
         version: 19.1.0
@@ -69,6 +72,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.11
+      '@types/bcrypt':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@types/node':
         specifier: ^20
         version: 20.19.10
@@ -84,9 +90,6 @@ importers:
       eslint-config-next:
         specifier: 15.4.6
         version: 15.4.6(eslint@9.32.0(jiti@2.5.1))(typescript@5.9.2)
-      prisma:
-        specifier: ^6.13.0
-        version: 6.13.0(typescript@5.9.2)
       tailwindcss:
         specifier: ^4
         version: 4.1.11
@@ -1003,6 +1006,9 @@ packages:
 
   '@tybys/wasm-util@0.10.0':
     resolution: {integrity: sha512-VyyPYFlOMNylG45GoAe0xDoLwWuowvf92F9kySqzYh8vmYm7D2u4iUJKa1tOUpS70Ku13ASrOkS4ScXFsTaCNQ==}
+
+  '@types/bcrypt@6.0.0':
+    resolution: {integrity: sha512-/oJGukuH3D2+D+3H4JWLaAsJ/ji86dhRidzZ/Od7H/i8g+aCmvkeCc6Ni/f9uxGLSQVCRZkX2/lqEFG2BvWtlQ==}
 
   '@types/d3-array@3.2.1':
     resolution: {integrity: sha512-Y2Jn2idRrLzUfAKV2LyRImR+y4oa2AntrgID95SHJxuMUrkNXmanDSed71sRNZysveJVt1hLLemQZIady0FpEg==}
@@ -3575,6 +3581,10 @@ snapshots:
     dependencies:
       tslib: 2.8.1
     optional: true
+
+  '@types/bcrypt@6.0.0':
+    dependencies:
+      '@types/node': 20.19.10
 
   '@types/d3-array@3.2.1': {}
 

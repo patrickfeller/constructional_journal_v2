@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { revalidatePath } from "next/cache";
 
 const createCompanySchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -10,13 +11,13 @@ const createCompanySchema = z.object({
     .optional(),
 });
 
-export async function createCompany(formData: FormData) {
+export async function createCompany(formData: FormData): Promise<void> {
   const parsed = createCompanySchema.safeParse({
     name: formData.get("name"),
     hourlyRateDefault: formData.get("hourlyRateDefault"),
   });
   if (!parsed.success) {
-    return { ok: false, error: "Invalid input" };
+    return;
   }
   const { name, hourlyRateDefault } = parsed.data;
   await db.company.create({
@@ -26,7 +27,7 @@ export async function createCompany(formData: FormData) {
         typeof hourlyRateDefault === "number" ? hourlyRateDefault : null,
     },
   });
-  return { ok: true };
+  revalidatePath("/companies");
 }
 
 

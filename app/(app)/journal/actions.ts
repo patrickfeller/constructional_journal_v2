@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { saveFilesToPublicUploads } from "@/lib/upload";
+import { revalidatePath } from "next/cache";
 
 const schema = z.object({
   projectId: z.string().min(1),
@@ -12,7 +13,7 @@ const schema = z.object({
   tags: z.string().optional().or(z.literal("")),
 });
 
-export async function createJournalEntry(formData: FormData) {
+export async function createJournalEntry(formData: FormData): Promise<void> {
   const parsed = schema.safeParse({
     projectId: formData.get("projectId"),
     date: formData.get("date"),
@@ -20,7 +21,7 @@ export async function createJournalEntry(formData: FormData) {
     notes: formData.get("notes") ?? undefined,
     tags: formData.get("tags") ?? undefined,
   });
-  if (!parsed.success) return { ok: false, error: "Invalid input" };
+  if (!parsed.success) return;
   const { projectId, date, title, notes, tags } = parsed.data;
 
   const files = formData.getAll("photos").filter((f) => f instanceof File) as File[];
@@ -28,7 +29,7 @@ export async function createJournalEntry(formData: FormData) {
 
   const demoUser = await db.user.findFirst({ where: { email: "demo@example.com" } });
   const userId = demoUser?.id ?? undefined;
-  const entry = await db.journalEntry.create({
+  await db.journalEntry.create({
     data: {
       projectId,
       userId: userId!,
@@ -39,7 +40,7 @@ export async function createJournalEntry(formData: FormData) {
       photos: { create: urls.map((url) => ({ url })) },
     },
   });
-  return { ok: true, id: entry.id };
+  revalidatePath("/journal");
 }
 
 function tryParseJson(value?: string) {
