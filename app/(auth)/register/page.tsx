@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
   const params = useSearchParams();
   const callbackUrl = params.get("callbackUrl") ?? "/";
@@ -72,6 +72,19 @@ export default function RegisterPage() {
         Already have an account? <a href="/auth" className="text-indigo-600 hover:underline">Sign in</a>
       </div>
     </main>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <main className="p-6 max-w-md mx-auto">
+        <h1 className="text-2xl font-semibold mb-4">Create account</h1>
+        <div className="text-gray-600 text-sm">Loading...</div>
+      </main>
+    }>
+      <RegisterForm />
+    </Suspense>
   );
 }
 

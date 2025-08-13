@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 
-export default function AuthPage() {
+function AuthForm() {
   const params = useSearchParams();
   const callbackUrl = params.get("callbackUrl") ?? "/";
   const [email, setEmail] = useState("");
@@ -64,6 +64,19 @@ export default function AuthPage() {
         New here? <a href="/register" className="text-indigo-600 hover:underline">Create an account</a>
       </div>
     </main>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <main className="p-6 max-w-md mx-auto">
+        <h1 className="text-2xl font-semibold mb-4">Sign in</h1>
+        <div className="text-gray-600 text-sm">Loading...</div>
+      </main>
+    }>
+      <AuthForm />
+    </Suspense>
   );
 }
 
