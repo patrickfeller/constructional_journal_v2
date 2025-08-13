@@ -2,11 +2,13 @@ import { db } from "@/lib/db";
 import { createProject, deleteProject } from "./actions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { ProjectEditForm } from "./ProjectEditForm";
 
 export default async function ProjectsPage() {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
   const projects = await db.project.findMany({ where: userId ? { userId } : undefined, orderBy: { createdAt: "desc" } });
+  
   return (
     <main className="p-6 max-w-5xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold">Projects</h1>
@@ -26,10 +28,13 @@ export default async function ProjectsPage() {
                 <div className="font-medium">{p.name}</div>
                 {p.address ? <div className="text-sm text-gray-500">{p.address}</div> : null}
               </div>
-              <form action={deleteProject}>
-                <input type="hidden" name="id" value={p.id} />
-                <button className="text-red-600 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 rounded">Delete</button>
-              </form>
+              <div className="flex gap-2">
+                <ProjectEditForm project={p} />
+                <form action={deleteProject}>
+                  <input type="hidden" name="id" value={p.id} />
+                  <button className="text-red-600 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 rounded">Delete</button>
+                </form>
+              </div>
             </li>
           ))}
         </ul>
