@@ -1,8 +1,12 @@
 import { db } from "@/lib/db";
 import { createProject, deleteProject } from "./actions";
+import { getServerSession } from "next-auth";
+import { authOptions } from "app/api/auth/[...nextauth]/route";
 
 export default async function ProjectsPage() {
-  const projects = await db.project.findMany({ orderBy: { createdAt: "desc" } });
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
+  const projects = await db.project.findMany({ where: userId ? { userId } : undefined, orderBy: { createdAt: "desc" } });
   return (
     <main className="p-6 max-w-5xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold">Projects</h1>

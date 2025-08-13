@@ -1,13 +1,17 @@
 import Image from "next/image";
 import { db } from "@/lib/db";
+import { getServerSession } from "next-auth";
+import { authOptions } from "app/api/auth/[...nextauth]/route";
 export const dynamic = "force-dynamic";
 import { createJournalEntry } from "./actions";
 import { PhotoGrid } from "@/components/PhotoGrid";
 
 export default async function JournalListPage() {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
   const [projects, entries] = await Promise.all([
-    db.project.findMany({ orderBy: { name: "asc" } }),
-    db.journalEntry.findMany({ include: { photos: true, project: true }, orderBy: { date: "desc" } }),
+    db.project.findMany({ where: userId ? ({ userId } as any) : undefined, orderBy: { name: "asc" } }),
+    db.journalEntry.findMany({ where: userId ? { userId } : undefined, include: { photos: true, project: true }, orderBy: { date: "desc" } }),
   ]);
   return (
     <main className="p-6 max-w-5xl mx-auto space-y-6">

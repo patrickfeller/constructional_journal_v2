@@ -4,6 +4,8 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { saveFilesToPublicUploads } from "@/lib/upload";
 import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth";
+import { authOptions } from "app/api/auth/[...nextauth]/route";
 
 const schema = z.object({
   projectId: z.string().min(1),
@@ -14,6 +16,9 @@ const schema = z.object({
 });
 
 export async function createJournalEntry(formData: FormData): Promise<void> {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
+  if (!userId) return;
   const parsed = schema.safeParse({
     projectId: formData.get("projectId"),
     date: formData.get("date"),
@@ -26,16 +31,10 @@ export async function createJournalEntry(formData: FormData): Promise<void> {
 
   const files = formData.getAll("photos").filter((f) => f instanceof File) as File[];
   const urls = files.length ? await saveFilesToPublicUploads(files) : [];
-
-  const user = await db.user.upsert({
-    where: { email: "demo@example.com" },
-    update: {},
-    create: { email: "demo@example.com", name: "Demo User", role: "OWNER" },
-  });
   await db.journalEntry.create({
     data: {
       projectId,
-      userId: user.id,
+      userId,
       date: new Date(date),
       title,
       notes: notes || null,

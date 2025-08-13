@@ -3,6 +3,8 @@
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth";
+import { authOptions } from "app/api/auth/[...nextauth]/route";
 
 const manualSchema = z.object({
   projectId: z.string().min(1),
@@ -15,6 +17,9 @@ const manualSchema = z.object({
 });
 
 export async function createManualTime(formData: FormData): Promise<void> {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
+  if (!userId) return;
   const parsed = manualSchema.safeParse({
     projectId: formData.get("projectId"),
     personId: formData.get("personId"),
@@ -42,6 +47,7 @@ export async function createManualTime(formData: FormData): Promise<void> {
       breakMinutes,
       durationMinutes,
       notes: notes || null,
+      userId,
     },
   });
   revalidatePath("/time");

@@ -1,10 +1,14 @@
 import { db } from "@/lib/db";
 import { createPerson } from "./actions";
+import { getServerSession } from "next-auth";
+import { authOptions } from "app/api/auth/[...nextauth]/route";
 
 export default async function PeoplePage() {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
   const [people, companies, hoursByPerson] = await Promise.all([
-    db.person.findMany({ include: { company: true }, orderBy: { name: "asc" } }),
-    db.company.findMany({ orderBy: { name: "asc" } }),
+    db.person.findMany({ where: userId ? { userId } : undefined, include: { company: true }, orderBy: { name: "asc" } }),
+    db.company.findMany({ where: userId ? { userId } : undefined, orderBy: { name: "asc" } }),
     db.timeEntry.groupBy({ by: ["personId"], _sum: { durationMinutes: true } }),
   ]);
 

@@ -1,9 +1,13 @@
 import { db } from "@/lib/db";
 import { createCompany } from "./actions";
+import { getServerSession } from "next-auth";
+import { authOptions } from "app/api/auth/[...nextauth]/route";
 
 export default async function CompaniesPage() {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
   const [companies, peopleByCompany] = await Promise.all([
-    db.company.findMany({ orderBy: { name: "asc" } }),
+    db.company.findMany({ where: userId ? { userId } : undefined, orderBy: { name: "asc" } }),
     db.person.groupBy({ by: ["companyId"], _count: { _all: true } }),
   ]);
   const countMap = new Map<string, number>(

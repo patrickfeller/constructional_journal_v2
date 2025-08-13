@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, BookText, Timer, BarChart3, Settings, Users, Building2, Folder } from "lucide-react";
 import { ModeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
+import { useSession, signOut } from "next-auth/react";
 
 const links = [
   { href: "/", label: "Home", Icon: Home },
@@ -19,6 +20,7 @@ const links = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <aside className="hidden md:flex md:flex-col w-64 h-screen sticky top-0 bg-card text-card-foreground border-r flex-shrink-0">
@@ -29,7 +31,21 @@ export function Sidebar() {
         ))}
       </nav>
       <div className="p-3 border-t">
-        <ModeToggle />
+        <div className="flex items-center justify-between gap-2">
+          <ModeToggle />
+          {session?.user ? (
+            <button
+              onClick={() => signOut({ callbackUrl: "/auth" })}
+              className="text-sm text-muted-foreground hover:underline"
+            >
+              Sign out
+            </button>
+          ) : (
+            <Link href="/auth" className="text-sm text-muted-foreground hover:underline">
+              Sign in
+            </Link>
+          )}
+        </div>
       </div>
     </aside>
   );

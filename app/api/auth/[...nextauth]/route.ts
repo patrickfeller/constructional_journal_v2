@@ -10,9 +10,12 @@ const credentialsSchema = z.object({
   password: z.string().min(6),
 });
 
-const authOptions = {
+export const authOptions = {
   adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
+  pages: {
+    signIn: "/auth",
+  },
   providers: [
     Credentials({
       credentials: {
@@ -23,7 +26,8 @@ const authOptions = {
         const parsed = credentialsSchema.safeParse(credentials);
         if (!parsed.success) return null;
         const { email, password } = parsed.data;
-        const user = await db.user.findUnique({ where: { email } });
+        const normalizedEmail = email.trim().toLowerCase();
+        const user = await db.user.findUnique({ where: { email: normalizedEmail } });
         if (!user?.passwordHash) return null;
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return null;
@@ -33,11 +37,15 @@ const authOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) (token as any).role = (user as any).role;
+      if (user) {
+        (token as any).role = (user as any).role;
+        (token as any).id = (user as any).id;
+      }
       return token;
     },
     async session({ session, token }) {
       (session.user as any).role = (token as any).role;
+      (session.user as any).id = (token as any).id;
       return session;
     },
   },

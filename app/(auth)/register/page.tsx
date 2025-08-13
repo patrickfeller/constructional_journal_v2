@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function AuthPage() {
+export default function RegisterPage() {
+  const router = useRouter();
   const params = useSearchParams();
   const callbackUrl = params.get("callbackUrl") ?? "/";
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -16,22 +17,31 @@ export default function AuthPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const res = await signIn("credentials", {
-      redirect: true,
-      email,
-      password,
-      callbackUrl,
+    const res = await fetch("/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password }),
     });
-    if (res?.error) {
-      setError("Invalid email or password");
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setError(data?.error || "Registration failed");
       setLoading(false);
+      return;
     }
+    router.push(`/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   }
 
   return (
     <main className="p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-semibold mb-4">Sign in</h1>
+      <h1 className="text-2xl font-semibold mb-4">Create account</h1>
       <form onSubmit={onSubmit} className="grid gap-3">
+        <input
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+          required
+        />
         <input
           type="email"
           placeholder="Email"
@@ -42,11 +52,12 @@ export default function AuthPage() {
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Password (min 6 chars)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
           required
+          minLength={6}
         />
         {error ? <div className="text-sm text-red-600">{error}</div> : null}
         <button
@@ -54,14 +65,11 @@ export default function AuthPage() {
           disabled={loading}
           className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white px-4 py-2 w-fit"
         >
-          {loading ? "Signing in..." : "Sign in"}
+          {loading ? "Creating..." : "Create account"}
         </button>
       </form>
-      <p className="text-gray-600 text-sm mt-3">
-        Hint: demo@example.com / demo1234 (from seed)
-      </p>
       <div className="text-sm mt-4">
-        New here? <a href="/register" className="text-indigo-600 hover:underline">Create an account</a>
+        Already have an account? <a href="/auth" className="text-indigo-600 hover:underline">Sign in</a>
       </div>
     </main>
   );

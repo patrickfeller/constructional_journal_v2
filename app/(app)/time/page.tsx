@@ -1,12 +1,16 @@
 import { db } from "@/lib/db";
 export const dynamic = "force-dynamic";
 import { createManualTime } from "./actions";
+import { getServerSession } from "next-auth";
+import { authOptions } from "app/api/auth/[...nextauth]/route";
 
 export default async function TimePage() {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
   const [projects, people, timeEntries] = await Promise.all([
-    db.project.findMany({ orderBy: { name: "asc" } }),
-    db.person.findMany({ orderBy: { name: "asc" } }),
-    db.timeEntry.findMany({ include: { project: true, person: true }, orderBy: { date: "desc" } }),
+    db.project.findMany({ where: userId ? { userId } : undefined, orderBy: { name: "asc" } }),
+    db.person.findMany({ where: userId ? { userId } : undefined, orderBy: { name: "asc" } }),
+    db.timeEntry.findMany({ where: userId ? { userId } : undefined, include: { project: true, person: true }, orderBy: { date: "desc" } }),
   ]);
   return (
     <main className="p-6 max-w-5xl mx-auto space-y-6">

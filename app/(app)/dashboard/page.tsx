@@ -1,17 +1,21 @@
 import { db } from "@/lib/db";
 import { DashboardTimeChart, type TimePoint } from "@/components/DashboardTimeChart";
 import { DashboardFilters } from "@/components/DashboardFilters";
+import { getServerSession } from "next-auth";
+import { authOptions } from "app/api/auth/[...nextauth]/route";
 
 function startOfDay(d: Date) { d.setHours(0,0,0,0); return d; }
 function addDays(d: Date, days: number) { const x = new Date(d); x.setDate(x.getDate()+days); return x; }
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ projectId?: string; personId?: string; companyId?: string }> }) {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
   const resolved = await searchParams;
   const now = new Date();
   const weekStart = startOfDay(addDays(new Date(now), -now.getDay()));
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const whereBase: any = {};
+  const whereBase: any = userId ? { userId } : {};
   if (resolved?.projectId) whereBase.projectId = resolved.projectId;
   if (resolved?.personId) whereBase.personId = resolved.personId;
   if (resolved?.companyId) whereBase.companyId = resolved.companyId;
@@ -20,17 +24,17 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: whereBase }),
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...whereBase, date: { gte: weekStart } } }),
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...whereBase, date: { gte: monthStart } } }),
-    db.journalEntry.count(),
-    db.photo.count(),
+    db.journalEntry.count({ where: userId ? { userId } : undefined }),
+    db.photo.count({ where: userId ? ({ journalEntry: { userId } } as any) : undefined }),
   ]);
 
   const toHours = (mins?: number | null) => ((mins ?? 0) / 60).toFixed(1);
 
   const hoursByProject = await db.timeEntry.groupBy({ by: ["projectId"], _sum: { durationMinutes: true }, where: whereBase });
   const [projects, people, companies] = await Promise.all([
-    db.project.findMany({ orderBy: { name: "asc" } }),
-    db.person.findMany({ orderBy: { name: "asc" } }),
-    db.company.findMany({ orderBy: { name: "asc" } }),
+    db.project.findMany({ where: userId ? ({ userId } as any) : undefined, orderBy: { name: "asc" } }),
+    db.person.findMany({ where: userId ? ({ userId } as any) : undefined, orderBy: { name: "asc" } }),
+    db.company.findMany({ where: userId ? ({ userId } as any) : undefined, orderBy: { name: "asc" } }),
   ]);
   const projectMap = new Map(projects.map(p => [p.id, p.name] as const));
 

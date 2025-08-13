@@ -37,6 +37,10 @@ model User {
 
   // Reverse relations
   journalEntries JournalEntry[] @relation("UserJournalEntries")
+  projects       Project[]       @relation("UserProjects")
+  companies      Company[]       @relation("UserCompanies")
+  people         Person[]        @relation("UserPeople")
+  timeEntries    TimeEntry[]     @relation("UserTimeEntries")
 
   @@index([role])
 }
@@ -47,12 +51,15 @@ model Project {
   address   String?
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
+  userId    String?
+  owner     User?    @relation("UserProjects", fields: [userId], references: [id])
 
   journalEntries JournalEntry[]
   timeEntries    TimeEntry[]
 
   @@index([active])
   @@index([name])
+  @@index([userId])
 }
 
 model Company {
@@ -60,11 +67,14 @@ model Company {
   name               String   @unique
   hourlyRateDefault  Decimal?
   createdAt          DateTime @default(now())
+  userId             String?
+  owner              User?    @relation("UserCompanies", fields: [userId], references: [id])
 
   people      Person[]
   timeEntries TimeEntry[]
 
   @@index([name])
+  @@index([userId])
 }
 
 model Person {
@@ -74,11 +84,14 @@ model Person {
   companyId   String?
   company     Company? @relation(fields: [companyId], references: [id])
   createdAt   DateTime @default(now())
+  userId      String?
+  owner       User?    @relation("UserPeople", fields: [userId], references: [id])
 
   timeEntries TimeEntry[]
 
   @@index([companyId])
   @@index([name])
+  @@index([userId])
 }
 
 model JournalEntry {
@@ -131,6 +144,8 @@ model TimeEntry {
   durationMinutes  Int        @default(0)
   notes            String?
   createdAt        DateTime   @default(now())
+  userId           String?
+  owner            User?      @relation("UserTimeEntries", fields: [userId], references: [id])
 
   timer            Timer?
 
@@ -138,6 +153,7 @@ model TimeEntry {
   @@index([date])
   @@index([personId])
   @@index([companyId])
+  @@index([userId])
 }
 
 model Timer {
