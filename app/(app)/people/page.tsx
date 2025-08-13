@@ -1,7 +1,8 @@
 import { db } from "@/lib/db";
-import { createPerson } from "./actions";
+import { createPerson, deletePerson } from "./actions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { PersonEditForm } from "./PersonEditForm";
 
 export default async function PeoplePage() {
   const session = await getServerSession(authOptions);
@@ -40,12 +41,25 @@ export default async function PeoplePage() {
           {people.map((p) => {
             const totalMinutes = minutesMap.get(p.id) ?? 0;
             return (
-              <li key={p.id} className="py-3 flex items-center justify-between">
-                <div>
-                  <div className="font-medium">{p.name}</div>
-                  <div className="text-sm text-muted-foreground">{p.company?.name ?? "—"}</div>
+              <li key={p.id} className="py-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <div className="font-medium">{p.name}</div>
+                    <div className="text-sm text-muted-foreground">{p.company?.name ?? "—"}</div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-sm font-medium text-muted-foreground">{toHours(totalMinutes)}h</div>
+                    <div className="flex gap-2">
+                      <PersonEditForm person={p} companies={companies} />
+                      <form action={deletePerson}>
+                        <input type="hidden" name="id" value={p.id} />
+                        <button className="text-red-600 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 rounded">
+                          Delete
+                        </button>
+                      </form>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm font-medium text-muted-foreground">{toHours(totalMinutes)}h</div>
               </li>
             );
           })}
