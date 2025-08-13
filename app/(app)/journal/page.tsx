@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "app/api/auth/[...nextauth]/route";
@@ -13,6 +12,7 @@ export default async function JournalListPage() {
     db.project.findMany({ where: userId ? ({ userId } as any) : undefined, orderBy: { name: "asc" } }),
     db.journalEntry.findMany({ where: userId ? { userId } : undefined, include: { photos: true, project: true }, orderBy: { date: "desc" } }),
   ]);
+  const today = new Date().toISOString().slice(0, 10);
   return (
     <main className="p-6 max-w-5xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold">Journal</h1>
@@ -25,7 +25,7 @@ export default async function JournalListPage() {
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
-            <input type="date" name="date" aria-label="Date" className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" required />
+            <input type="date" name="date" aria-label="Date" defaultValue={today} className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" required />
             <input name="title" placeholder="Title" className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" required />
           </div>
           <textarea name="notes" aria-label="Notes" placeholder="Notes (Markdown supported)" className="border rounded-md px-3 py-2 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" />

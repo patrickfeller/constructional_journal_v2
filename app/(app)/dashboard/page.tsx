@@ -20,12 +20,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   if (resolved?.personId) whereBase.personId = resolved.personId;
   if (resolved?.companyId) whereBase.companyId = resolved.companyId;
 
-  const [all, week, month, entriesCount, photosCount] = await Promise.all([
+  const [all, week, month, entriesCount] = await Promise.all([
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: whereBase }),
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...whereBase, date: { gte: weekStart } } }),
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...whereBase, date: { gte: monthStart } } }),
     db.journalEntry.count({ where: userId ? { userId } : undefined }),
-    db.photo.count({ where: userId ? ({ journalEntry: { userId } } as any) : undefined }),
   ]);
 
   const toHours = (mins?: number | null) => ((mins ?? 0) / 60).toFixed(1);

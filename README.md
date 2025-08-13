@@ -36,4 +36,3 @@ pnpm dev
 - FIX: delete projects didn't work
 - show Markdown possibility in jounal entries
 - loading spinner when, that the user knows when app is in progress
-- add authentifaction page

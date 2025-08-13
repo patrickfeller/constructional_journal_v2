@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
     await db.user.create({ data: { name, email: normalizedEmail, passwordHash } });
     return NextResponse.json({ ok: true });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
