@@ -8,6 +8,7 @@ export async function saveFilesToPublicUploads(files: File[]): Promise<string[]>
 
   // Prefer Vercel Blob if configured
   const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+  const isVercel = !!process.env.VERCEL;
   if (blobToken) {
     for (const file of files) {
       const ext = path.extname(file.name) || "";
@@ -25,7 +26,12 @@ export async function saveFilesToPublicUploads(files: File[]): Promise<string[]>
     return urls;
   }
 
-  // Fallback to local FS when writable (useful for local dev)
+  // In Vercel prod, the file system is read-only. Require Blob token there.
+  if (isVercel) {
+    throw new Error("Uploads are disabled without BLOB_READ_WRITE_TOKEN in production. Configure Vercel Blob and set BLOB_READ_WRITE_TOKEN.");
+  }
+
+  // Fallback to local FS when writable (useful for local dev only)
   const uploadsDir = path.join(process.cwd(), "public", "uploads");
   try {
     await fs.mkdir(uploadsDir, { recursive: true });
