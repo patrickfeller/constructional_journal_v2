@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { DashboardTimeChart, type TimePoint } from "@/components/DashboardTimeChart";
 import { DashboardFilters } from "@/components/DashboardFilters";
 import { getServerSession } from "next-auth";
-import { authOptions } from "app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 function startOfDay(d: Date) { d.setHours(0,0,0,0); return d; }
 function addDays(d: Date, days: number) { const x = new Date(d); x.setDate(x.getDate()+days); return x; }

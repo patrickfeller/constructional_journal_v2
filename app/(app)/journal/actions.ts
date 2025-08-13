@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { saveFilesToPublicUploads } from "@/lib/upload";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
-import { authOptions } from "app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 const schema = z.object({
   projectId: z.string().min(1),
