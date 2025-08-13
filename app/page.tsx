@@ -1,30 +1,51 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/lib/db";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 function startOfDay(d: Date) { d.setHours(0,0,0,0); return d; }
 function addDays(d: Date, days: number) { const x = new Date(d); x.setDate(x.getDate()+days); return x; }
 
 export default async function Home() {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
+  
   const now = new Date();
   const weekStart = startOfDay(addDays(new Date(now), -now.getDay()));
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
+  // Only show data if user is authenticated
+  if (!userId) {
+    return (
+      <main className="p-6 max-w-5xl mx-auto space-y-6">
+        <div className="text-center py-12">
+          <h1 className="text-2xl font-semibold mb-4">Welcome to Construction Journal</h1>
+          <p className="text-muted-foreground">Please sign in to view your dashboard and recent activities.</p>
+        </div>
+      </main>
+    );
+  }
+
+  const whereBase = { userId } as any;
+
   const [all, week, month, entriesCount] = await Promise.all([
-    db.timeEntry.aggregate({ _sum: { durationMinutes: true } }),
-    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { date: { gte: weekStart } } }),
-    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { date: { gte: monthStart } } }),
-    db.journalEntry.count(),
+    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: whereBase }),
+    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...whereBase, date: { gte: weekStart } } }),
+    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...whereBase, date: { gte: monthStart } } }),
+    db.journalEntry.count({ where: { userId } as any }),
   ]);
 
   const toHours = (mins?: number | null) => ((mins ?? 0) / 60).toFixed(1);
 
   const [recentTime, recentJournal] = await Promise.all([
     db.timeEntry.findMany({
+      where: whereBase,
       include: { project: true, person: true },
       orderBy: { date: "desc" },
       take: 5,
     }),
     db.journalEntry.findMany({
+      where: { userId } as any,
       include: { project: true },
       orderBy: { date: "desc" },
       take: 5,
@@ -60,7 +81,7 @@ export default async function Home() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{toHours(week._sum.durationMinutes)}</div>
+            <div className="text-2xl font-bold">{toHours(week._sum?.durationMinutes)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -70,7 +91,7 @@ export default async function Home() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{toHours(month._sum.durationMinutes)}</div>
+            <div className="text-2xl font-bold">{toHours(month._sum?.durationMinutes)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -80,7 +101,7 @@ export default async function Home() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{toHours(all._sum.durationMinutes)}</div>
+            <div className="text-2xl font-bold">{toHours(all._sum?.durationMinutes)}</div>
           </CardContent>
         </Card>
         <Card>
