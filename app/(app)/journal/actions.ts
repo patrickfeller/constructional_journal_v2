@@ -13,24 +13,25 @@ const schema = z.object({
   title: z.string().min(1),
   notes: z.string().optional().or(z.literal("")),
   tags: z.string().optional().or(z.literal("")),
+  photoUrls: z.array(z.string()).optional(),
 });
 
 export async function createJournalEntry(formData: FormData): Promise<void> {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
   if (!userId) return;
+  
   const parsed = schema.safeParse({
     projectId: formData.get("projectId"),
     date: formData.get("date"),
     title: formData.get("title"),
     notes: formData.get("notes") ?? undefined,
     tags: formData.get("tags") ?? undefined,
+    photoUrls: formData.getAll("photoUrls"),
   });
   if (!parsed.success) return;
-  const { projectId, date, title, notes, tags } = parsed.data;
+  const { projectId, date, title, notes, tags, photoUrls } = parsed.data;
 
-  const files = formData.getAll("photos").filter((f) => f instanceof File) as File[];
-  const urls = files.length ? await saveFilesToPublicUploads(files) : [];
   await db.journalEntry.create({
     data: {
       projectId,
@@ -39,7 +40,7 @@ export async function createJournalEntry(formData: FormData): Promise<void> {
       title,
       notes: notes || null,
       tags: tags ? tryParseJson(tags) : undefined,
-      photos: { create: urls.map((url) => ({ url })) },
+      photos: photoUrls && photoUrls.length > 0 ? { create: photoUrls.map((url) => ({ url })) } : undefined,
     },
   });
   revalidatePath("/journal");

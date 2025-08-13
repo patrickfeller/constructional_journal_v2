@@ -67,3 +67,65 @@ body {
   color: var(--color-foreground);
 }
 
+/* Markdown styling for journal notes - added without breaking Tailwind */
+.prose {
+  line-height: 1.6;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose h1 { font-size: 1.5em; }
+.prose h2 { font-size: 1.25em; }
+.prose h3 { font-size: 1.125em; }
+
+.prose p {
+  margin-bottom: 1em;
+}
+
+.prose ul, .prose ol {
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+.prose li {
+  margin-bottom: 0.25em;
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose code {
+  background-color: rgb(243 244 246);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.875em;
+}
+
+.prose blockquote {
+  border-left: 4px solid rgb(209 213 219);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: rgb(107 114 128);
+}
+
+/* Dark mode adjustments */
+.dark .prose code {
+  background-color: rgb(55 65 81);
+}
+
+.dark .prose blockquote {
+  border-left-color: rgb(75 85 99);
+  color: rgb(156 163 175);
+}
+
