@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { updateJournalEntry } from "./actions";
 
 interface Project {
@@ -36,6 +36,9 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
     date: new Date(entry.date).toISOString().slice(0, 10),
     projectId: entry.projectId
   });
+  const [photos, setPhotos] = useState<Photo[]>(entry.photos);
+  const [newPhotos, setNewPhotos] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -45,6 +48,8 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
       date: new Date(entry.date).toISOString().slice(0, 10),
       projectId: entry.projectId
     });
+    setPhotos(entry.photos);
+    setNewPhotos([]);
   };
 
   const handleCancel = () => {
@@ -55,16 +60,47 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
       date: new Date(entry.date).toISOString().slice(0, 10),
       projectId: entry.projectId
     });
+    setPhotos(entry.photos);
+    setNewPhotos([]);
+  };
+
+  const handleRemovePhoto = (photoId: string) => {
+    setPhotos(photos.filter(photo => photo.id !== photoId));
+  };
+
+  const handleRemoveNewPhoto = (index: number) => {
+    setNewPhotos(newPhotos.filter((_, i) => i !== index));
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setNewPhotos(prev => [...prev, ...files]);
+    // Reset the input value so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Create FormData for the update
     const formDataObj = new FormData();
     formDataObj.append("id", entry.id);
     formDataObj.append("title", formData.title);
     formDataObj.append("notes", formData.notes);
     formDataObj.append("date", formData.date);
     formDataObj.append("projectId", formData.projectId);
+    
+    // Add existing photos that weren't removed
+    photos.forEach(photo => {
+      formDataObj.append("photoUrls", photo.url);
+    });
+    
+    // Add new photos
+    newPhotos.forEach(photo => {
+      formDataObj.append("photoUrls", photo);
+    });
     
     await updateJournalEntry(formDataObj);
     setIsEditing(false);
@@ -74,7 +110,7 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
 
   if (isEditing) {
     return (
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input
             type="text"
@@ -121,6 +157,79 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
             aria-label="Notes"
           />
         </div>
+        
+        {/* Photo Management Section */}
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Photos</h4>
+          
+          {/* Existing Photos */}
+          {photos.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400">Existing photos:</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {photos.map((photo) => (
+                  <div key={photo.id} className="relative group">
+                    <img
+                      src={photo.url}
+                      alt="Journal photo"
+                      className="w-full h-24 object-cover rounded-md border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemovePhoto(photo.id)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      title="Remove photo"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* New Photos */}
+          {newPhotos.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400">New photos to add:</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {newPhotos.map((photo, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={URL.createObjectURL(photo)}
+                      alt="New photo"
+                      className="w-full h-24 object-cover rounded-md border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveNewPhoto(index)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      title="Remove photo"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Add New Photos */}
+          <div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleFileSelect}
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900 dark:file:text-indigo-300"
+              aria-label="Add new photos"
+              title="Select photos to add"
+            />
+            <p className="text-xs text-gray-500 mt-1">Select one or more images to add</p>
+          </div>
+        </div>
+        
         <div className="flex gap-2">
           <button
             type="submit"

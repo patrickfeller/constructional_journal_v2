@@ -75,10 +75,13 @@ export async function updateJournalEntry(formData: FormData): Promise<void> {
   
   const { projectId, date, title, notes, tags, photoUrls } = parsed.data;
 
-  // First delete existing photos
-  await db.photo.deleteMany({
-    where: { journalEntryId: id }
-  });
+  // Only delete existing photos if new photos are provided
+  if (photoUrls && photoUrls.length > 0) {
+    // Delete existing photos
+    await db.photo.deleteMany({
+      where: { journalEntryId: id }
+    });
+  }
 
   // Update the journal entry
   await db.journalEntry.update({
@@ -89,7 +92,10 @@ export async function updateJournalEntry(formData: FormData): Promise<void> {
       title,
       notes: notes || null,
       tags: tags ? tryParseJson(tags) : undefined,
-      photos: photoUrls && photoUrls.length > 0 ? { create: photoUrls.map((url) => ({ url })) } : undefined,
+      // Only create new photos if they were provided, otherwise keep existing ones
+      ...(photoUrls && photoUrls.length > 0 && {
+        photos: { create: photoUrls.map((url) => ({ url })) }
+      }),
     },
   });
   
