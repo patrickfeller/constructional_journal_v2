@@ -1,10 +1,11 @@
 import { db } from "@/lib/db";
 export const dynamic = "force-dynamic";
-import { createJournalEntry } from "./actions";
+import { createJournalEntry, deleteJournalEntry } from "./actions";
 import { PhotoGrid } from "@/components/PhotoGrid";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { JournalForm } from "./JournalForm";
+import { JournalEditForm } from "./JournalEditForm";
 import ReactMarkdown from 'react-markdown';
 
 export default async function JournalListPage() {
@@ -27,7 +28,7 @@ export default async function JournalListPage() {
         <ul className="space-y-6">
           {entries.map((e) => (
             <li key={e.id} className="border rounded-xl p-6 bg-white dark:bg-gray-800">
-              {/* Header row: Project, Title, Date */}
+              {/* Header row: Project, Title, Date, and Action Buttons */}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1 min-w-0">
                   <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
@@ -37,8 +38,19 @@ export default async function JournalListPage() {
                     {e.title}
                   </h3>
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400 ml-4 flex-shrink-0">
-                  {new Date(e.date).toLocaleDateString()}
+                <div className="flex items-center gap-4 ml-4 flex-shrink-0">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {new Date(e.date).toLocaleDateString()}
+                  </div>
+                  <div className="flex gap-2">
+                    <JournalEditForm entry={e} projects={projects} />
+                    <form action={deleteJournalEntry}>
+                      <input type="hidden" name="id" value={e.id} />
+                      <button className="text-red-600 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 rounded">
+                        Delete
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </div>
               
