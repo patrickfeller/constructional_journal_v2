@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 export const dynamic = "force-dynamic";
 import { createManualTime } from "./actions";
 import { getServerSession } from "next-auth";
-import { authOptions } from "app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 export default async function TimePage() {
   const session = await getServerSession(authOptions);

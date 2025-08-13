@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { createProject, deleteProject } from "./actions";
 import { getServerSession } from "next-auth";
-import { authOptions } from "app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 export default async function ProjectsPage() {
   const session = await getServerSession(authOptions);

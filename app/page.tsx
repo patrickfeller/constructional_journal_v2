@@ -1,37 +1,30 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "app/api/auth/[...nextauth]/route";
 
 function startOfDay(d: Date) { d.setHours(0,0,0,0); return d; }
 function addDays(d: Date, days: number) { const x = new Date(d); x.setDate(x.getDate()+days); return x; }
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id;
   const now = new Date();
   const weekStart = startOfDay(addDays(new Date(now), -now.getDay()));
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const baseWhere: any = userId ? { userId } : {};
   const [all, week, month, entriesCount] = await Promise.all([
-    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: baseWhere }),
-    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...baseWhere, date: { gte: weekStart } } }),
-    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...baseWhere, date: { gte: monthStart } } }),
-    db.journalEntry.count({ where: userId ? { userId } : undefined }),
+    db.timeEntry.aggregate({ _sum: { durationMinutes: true } }),
+    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { date: { gte: weekStart } } }),
+    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { date: { gte: monthStart } } }),
+    db.journalEntry.count(),
   ]);
 
   const toHours = (mins?: number | null) => ((mins ?? 0) / 60).toFixed(1);
 
   const [recentTime, recentJournal] = await Promise.all([
     db.timeEntry.findMany({
-      where: baseWhere,
       include: { project: true, person: true },
       orderBy: { date: "desc" },
       take: 5,
     }),
     db.journalEntry.findMany({
-      where: userId ? { userId } : undefined,
       include: { project: true },
       orderBy: { date: "desc" },
       take: 5,
