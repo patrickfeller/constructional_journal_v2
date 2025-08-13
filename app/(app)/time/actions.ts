@@ -53,4 +53,56 @@ export async function createManualTime(formData: FormData): Promise<void> {
   revalidatePath("/time");
 }
 
+export async function updateTimeEntry(formData: FormData): Promise<void> {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
+  if (!userId) return;
+  
+  const id = String(formData.get("id"));
+  if (!id) return;
+  
+  const parsed = manualSchema.safeParse({
+    projectId: formData.get("projectId"),
+    personId: formData.get("personId"),
+    date: formData.get("date"),
+    start: formData.get("start"),
+    end: formData.get("end"),
+    breakMinutes: formData.get("breakMinutes") ?? 0,
+    notes: formData.get("notes") ?? undefined,
+  });
+  if (!parsed.success) return;
+  
+  const { projectId, personId, date, start, end, breakMinutes, notes } = parsed.data;
+
+  const startAt = new Date(`${date}T${start}:00`);
+  const endAt = new Date(`${date}T${end}:00`);
+  const durationMinutes = Math.max(0, Math.round((endAt.getTime() - startAt.getTime()) / 60000) - breakMinutes);
+
+  await db.timeEntry.update({
+    where: { id, userId } as any,
+    data: {
+      projectId,
+      personId: personId || null,
+      date: new Date(date),
+      startAt,
+      endAt,
+      breakMinutes,
+      durationMinutes,
+      notes: notes || null,
+    },
+  });
+  
+  revalidatePath("/time");
+}
+
+export async function deleteTimeEntry(formData: FormData): Promise<void> {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
+  const id = String(formData.get("id"));
+  if (!id || !userId) return;
+  
+  await db.timeEntry.delete({ where: { id, userId } as any });
+  revalidatePath("/time");
+}
+
 

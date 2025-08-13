@@ -1,8 +1,9 @@
 import { db } from "@/lib/db";
 export const dynamic = "force-dynamic";
-import { createManualTime } from "./actions";
+import { createManualTime, deleteTimeEntry } from "./actions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { TimeEditForm } from "./TimeEditForm";
 
 export default async function TimePage() {
   const session = await getServerSession(authOptions);
@@ -45,10 +46,21 @@ export default async function TimePage() {
         <h2 className="font-medium mb-2">Recent time entries</h2>
         <ul className="divide-y divide-border">
           {timeEntries.map((t: any) => (
-            <li key={t.id} className="py-3 flex items-center justify-between">
-              <div>
-                <div className="font-medium">{t.project.name}</div>
-                <div className="text-sm text-muted-foreground">{new Date(t.date).toLocaleDateString()} — {t.durationMinutes} mins{t.person ? ` — ${t.person.name}` : ""}</div>
+            <li key={t.id} className="py-3">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <div className="font-medium">{t.project.name}</div>
+                  <div className="text-sm text-muted-foreground">{new Date(t.date).toLocaleDateString()} — {t.durationMinutes} mins{t.person ? ` — ${t.person.name}` : ""}</div>
+                </div>
+                <div className="flex gap-2">
+                  <TimeEditForm entry={t} projects={projects} people={people} />
+                  <form action={deleteTimeEntry}>
+                    <input type="hidden" name="id" value={t.id} />
+                    <button className="text-red-600 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 rounded">
+                      Delete
+                    </button>
+                  </form>
+                </div>
               </div>
               {t.notes ? <div className="text-sm text-muted-foreground">{t.notes}</div> : null}
             </li>
