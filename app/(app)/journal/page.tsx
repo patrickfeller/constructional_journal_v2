@@ -11,9 +11,15 @@ import ReactMarkdown from 'react-markdown';
 export default async function JournalListPage() {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
-  const [projects, entries] = await Promise.all([
+  const [projects, entries, lastUsedProject] = await Promise.all([
     db.project.findMany({ where: userId ? ({ userId } as any) : undefined, orderBy: { name: "asc" } }),
     db.journalEntry.findMany({ where: userId ? { userId } : undefined, include: { photos: true, project: true }, orderBy: { date: "desc" } }),
+    // Get the last used project from the most recent journal entry
+    db.journalEntry.findFirst({ 
+      where: userId ? { userId } : undefined, 
+      orderBy: { createdAt: "desc" },
+      select: { projectId: true }
+    }),
   ]);
   const today = new Date().toISOString().slice(0, 10);
 
@@ -21,7 +27,7 @@ export default async function JournalListPage() {
     <main className="p-6 max-w-5xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold">Journal</h1>
       <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-4 border border-gray-200 dark:border-gray-800">
-        <JournalForm projects={projects} today={today} />
+        <JournalForm projects={projects} today={today} lastUsedProjectId={lastUsedProject?.projectId} />
       </section>
       <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-4 border border-gray-200 dark:border-gray-800">
         <h2 className="text-lg font-semibold mb-2">Recent entries</h2>

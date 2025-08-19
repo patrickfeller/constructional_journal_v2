@@ -8,10 +8,16 @@ import { TimeEditForm } from "./TimeEditForm";
 export default async function TimePage() {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
-  const [projects, people, timeEntries] = await Promise.all([
+  const [projects, people, timeEntries, lastUsedEntry] = await Promise.all([
     db.project.findMany({ where: userId ? ({ userId } as any) : undefined, orderBy: { name: "asc" } }),
     db.person.findMany({ where: userId ? ({ userId } as any) : undefined, orderBy: { name: "asc" } }),
     db.timeEntry.findMany({ where: userId ? ({ userId } as any) : undefined, include: { project: true, person: true }, orderBy: { date: "desc" } }) as any,
+    // Get the last used project and person from the most recent time entry
+    db.timeEntry.findFirst({ 
+      where: userId ? { userId } : undefined, 
+      orderBy: { createdAt: "desc" },
+      select: { projectId: true, personId: true }
+    }),
   ]);
   const today = new Date().toISOString().slice(0, 10);
   return (
@@ -20,13 +26,13 @@ export default async function TimePage() {
       <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-4 border border-gray-200 dark:border-gray-800">
         <h2 className="font-medium mb-2">Manual entry</h2>
         <form action={createManualTime} className="grid sm:grid-cols-3 gap-2 items-end">
-          <select name="projectId" aria-label="Project" className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" required>
+          <select name="projectId" aria-label="Project" defaultValue={lastUsedEntry?.projectId || ""} className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" required>
             <option value="">Select project</option>
             {projects.map((p) => (
               <option key={p.id} value={p.id}>{p.name}</option>
             ))}
           </select>
-          <select name="personId" aria-label="Person" className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800">
+          <select name="personId" aria-label="Person" defaultValue={lastUsedEntry?.personId || ""} className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800">
             <option value="">No person</option>
             {people.map((p) => (
               <option key={p.id} value={p.id}>{p.name}</option>

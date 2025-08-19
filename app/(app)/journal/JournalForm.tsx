@@ -6,9 +6,10 @@ import { upload } from '@vercel/blob/client';
 interface JournalFormProps {
   projects: any[];
   today: string;
+  lastUsedProjectId?: string;
 }
 
-export function JournalForm({ projects, today }: JournalFormProps) {
+export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
 
@@ -37,7 +38,7 @@ export function JournalForm({ projects, today }: JournalFormProps) {
   return (
     <form action="/api/journal" method="POST" className="grid gap-3">
       <div className="grid sm:grid-cols-3 gap-2">
-        <select name="projectId" aria-label="Project" className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" required>
+        <select name="projectId" aria-label="Project" defaultValue={lastUsedProjectId || ""} className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" required>
           <option value="">Select project</option>
           {projects.map((p) => (
             <option key={p.id} value={p.id}>{p.name}</option>
