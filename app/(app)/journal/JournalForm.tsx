@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { upload } from '@vercel/blob/client';
 import { WeatherData } from "@/lib/weather";
 
@@ -40,7 +40,7 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
     }
   };
 
-  const fetchWeather = async (projectId: string, date: string) => {
+  const fetchWeather = useCallback(async (projectId: string, date: string) => {
     const project = projects.find(p => p.id === projectId);
     if (!project || !project.latitude || !project.longitude) {
       setWeatherData(null);
@@ -64,7 +64,7 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
     } finally {
       setWeatherLoading(false);
     }
-  };
+  }, [projects]);
 
   useEffect(() => {
     if (selectedProjectId && selectedDate) {

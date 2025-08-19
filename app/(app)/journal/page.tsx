@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 export const dynamic = "force-dynamic";
-import { createJournalEntry, deleteJournalEntry } from "./actions";
+import { deleteJournalEntry } from "./actions";
 import { PhotoGrid } from "@/components/PhotoGrid";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";

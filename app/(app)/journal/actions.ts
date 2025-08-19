@@ -2,7 +2,6 @@
 
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { saveFilesToPublicUploads } from "@/lib/upload";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";

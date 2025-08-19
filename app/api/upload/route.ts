@@ -8,7 +8,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const result = await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async (pathname, clientPayload) => {
+      onBeforeGenerateToken: async (_pathname, _clientPayload) => {
         // Validate file types and size
         return {
           allowedContentTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
@@ -16,7 +16,7 @@ export async function POST(request: Request): Promise<NextResponse> {
           addRandomSuffix: true, // Prevent filename conflicts
         };
       },
-      onUploadCompleted: async ({ blob, tokenPayload }) => {
+      onUploadCompleted: async ({ blob }) => {
         console.log('Photo upload completed:', blob.url);
         // You could update a database here if needed
       },

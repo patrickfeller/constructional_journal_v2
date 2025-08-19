@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { updateJournalEntry } from "./actions";
 import { WeatherData } from "@/lib/weather";
 
@@ -87,7 +87,7 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
     }
   };
 
-  const fetchWeather = async (projectId: string, date: string) => {
+  const fetchWeather = useCallback(async (projectId: string, date: string) => {
     const project = projects.find(p => p.id === projectId);
     if (!project || !project.latitude || !project.longitude) {
       setWeatherData(null);
@@ -111,7 +111,7 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
     } finally {
       setWeatherLoading(false);
     }
-  };
+  }, [projects]);
 
   useEffect(() => {
     if (formData.projectId && formData.date) {

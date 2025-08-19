@@ -29,7 +29,7 @@ export default async function ProjectsPage() {
                 required 
               />
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Include street, city, country (e.g., "123 Main St, Vienna, Austria")
+                Include street, city, country (e.g., &quot;123 Main St, Vienna, Austria&quot;)
               </p>
             </div>
           </div>
