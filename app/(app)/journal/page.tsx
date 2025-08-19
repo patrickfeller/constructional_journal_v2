@@ -45,8 +45,17 @@ export default async function JournalListPage() {
                   </h3>
                 </div>
                 <div className="flex items-center gap-4 ml-4 flex-shrink-0">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(e.date).toLocaleDateString()}
+                  <div className="text-right">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(e.date).toLocaleDateString()}
+                    </div>
+                    {/* Weather Display */}
+                    {e.weather && typeof e.weather === 'object' && e.weather !== null && 'icon' in e.weather && 'temperature' in e.weather && (
+                      <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400 mt-1">
+                        <span>{(e.weather as any).icon}</span>
+                        <span>{(e.weather as any).temperature}°C</span>
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <JournalEditForm entry={e} projects={projects} />

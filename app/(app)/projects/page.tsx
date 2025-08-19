@@ -13,10 +13,27 @@ export default async function ProjectsPage() {
     <main className="p-6 max-w-5xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold">Projects</h1>
       <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-4 border border-gray-200 dark:border-gray-800">
-        <form action={createProject} className="grid sm:grid-cols-3 gap-2">
-          <input name="name" placeholder="Project name" className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" required />
-          <input name="address" placeholder="Address (optional)" className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" />
-          <button className="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2">Add Project</button>
+        <form action={createProject} className="grid gap-3">
+          <div className="grid sm:grid-cols-2 gap-2">
+            <input 
+              name="name" 
+              placeholder="Project name" 
+              className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+              required 
+            />
+            <div className="space-y-1">
+              <input 
+                name="address" 
+                placeholder="Full address" 
+                className="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+                required 
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Include street, city, country (e.g., "123 Main St, Vienna, Austria")
+              </p>
+            </div>
+          </div>
+          <button className="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 w-fit">Add Project</button>
         </form>
       </section>
       <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-4 border border-gray-200 dark:border-gray-800">
@@ -27,6 +44,11 @@ export default async function ProjectsPage() {
               <div>
                 <div className="font-medium">{p.name}</div>
                 {p.address ? <div className="text-sm text-gray-500">{p.address}</div> : null}
+                {(p.latitude && p.longitude) && (
+                  <div className="text-xs text-gray-400">
+                    📍 {p.latitude.toFixed(4)}, {p.longitude.toFixed(4)}
+                  </div>
+                )}
               </div>
               <div className="flex gap-2">
                 <ProjectEditForm project={p} />

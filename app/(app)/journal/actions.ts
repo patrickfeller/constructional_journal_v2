@@ -14,6 +14,7 @@ const schema = z.object({
   notes: z.string().optional().or(z.literal("")),
   tags: z.string().optional().or(z.literal("")),
   photoUrls: z.array(z.string()).optional(),
+  weather: z.string().optional().or(z.literal("")),
 });
 
 export async function createJournalEntry(formData: FormData): Promise<void> {
@@ -28,9 +29,10 @@ export async function createJournalEntry(formData: FormData): Promise<void> {
     notes: formData.get("notes") ?? undefined,
     tags: formData.get("tags") ?? undefined,
     photoUrls: formData.getAll("photoUrls"),
+    weather: formData.get("weather") ?? undefined,
   });
   if (!parsed.success) return;
-  const { projectId, date, title, notes, tags, photoUrls } = parsed.data;
+  const { projectId, date, title, notes, tags, photoUrls, weather } = parsed.data;
 
   await db.journalEntry.create({
     data: {
@@ -40,6 +42,7 @@ export async function createJournalEntry(formData: FormData): Promise<void> {
       title,
       notes: notes || null,
       tags: tags ? tryParseJson(tags) : undefined,
+      weather: weather ? tryParseJson(weather) : undefined,
       photos: photoUrls && photoUrls.length > 0 ? { create: photoUrls.map((url) => ({ url })) } : undefined,
     },
   });
@@ -70,10 +73,11 @@ export async function updateJournalEntry(formData: FormData): Promise<void> {
     notes: formData.get("notes") ?? undefined,
     tags: formData.get("tags") ?? undefined,
     photoUrls: formData.getAll("photoUrls"),
+    weather: formData.get("weather") ?? undefined,
   });
   if (!parsed.success) return;
   
-  const { projectId, date, title, notes, tags, photoUrls } = parsed.data;
+  const { projectId, date, title, notes, tags, photoUrls, weather } = parsed.data;
 
   // Only delete existing photos if new photos are provided
   if (photoUrls && photoUrls.length > 0) {
@@ -92,6 +96,7 @@ export async function updateJournalEntry(formData: FormData): Promise<void> {
       title,
       notes: notes || null,
       tags: tags ? tryParseJson(tags) : undefined,
+      weather: weather ? tryParseJson(weather) : undefined,
       // Only create new photos if they were provided, otherwise keep existing ones
       ...(photoUrls && photoUrls.length > 0 && {
         photos: { create: photoUrls.map((url) => ({ url })) }

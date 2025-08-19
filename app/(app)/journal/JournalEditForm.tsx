@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { updateJournalEntry } from "./actions";
+import { WeatherData } from "@/lib/weather";
 
 interface Project {
   id: string;
   name: string;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 interface Photo {
@@ -21,6 +24,7 @@ interface JournalEntry {
   projectId: string;
   project: Project;
   photos: Photo[];
+  weather: any;
 }
 
 interface JournalEditFormProps {
@@ -38,6 +42,8 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
   });
   const [photos, setPhotos] = useState<Photo[]>(entry.photos);
   const [newPhotos, setNewPhotos] = useState<File[]>([]);
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(entry.weather);
+  const [weatherLoading, setWeatherLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleEdit = () => {
@@ -81,6 +87,38 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
     }
   };
 
+  const fetchWeather = async (projectId: string, date: string) => {
+    const project = projects.find(p => p.id === projectId);
+    if (!project || !project.latitude || !project.longitude) {
+      setWeatherData(null);
+      return;
+    }
+
+    setWeatherLoading(true);
+    try {
+      const response = await fetch(
+        `/api/weather?latitude=${project.latitude}&longitude=${project.longitude}&date=${date}`
+      );
+      if (response.ok) {
+        const weather = await response.json();
+        setWeatherData(weather);
+      } else {
+        setWeatherData(null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch weather:', error);
+      setWeatherData(null);
+    } finally {
+      setWeatherLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (formData.projectId && formData.date) {
+      fetchWeather(formData.projectId, formData.date);
+    }
+  }, [formData.projectId, formData.date, projects]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -101,6 +139,11 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
     newPhotos.forEach(photo => {
       formDataObj.append("photoUrls", photo);
     });
+    
+    // Add weather data if available
+    if (weatherData) {
+      formDataObj.append("weather", JSON.stringify(weatherData));
+    }
     
     await updateJournalEntry(formDataObj);
     setIsEditing(false);
@@ -157,6 +200,24 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
             aria-label="Notes"
           />
         </div>
+        
+        {/* Weather Information */}
+        {weatherLoading && (
+          <div className="text-sm text-gray-600">Loading weather data...</div>
+        )}
+        {weatherData && (
+          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-2xl">{weatherData.icon}</span>
+              <div>
+                <div className="font-medium">{weatherData.description}</div>
+                <div className="text-gray-600 dark:text-gray-400">
+                  {weatherData.temperature}°C on {new Date(weatherData.date).toLocaleDateString()}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Photo Management Section */}
         <div className="space-y-3">

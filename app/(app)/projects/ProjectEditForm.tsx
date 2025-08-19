@@ -7,6 +7,8 @@ interface Project {
   id: string;
   name: string;
   address: string | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 interface ProjectEditFormProps {
@@ -66,9 +68,10 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
           name="address"
           value={formData.address}
           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-          placeholder="Address (optional)"
+          placeholder="Full address"
           className="border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
           aria-label="Project address"
+          required
         />
         <button
           type="submit"
