@@ -32,7 +32,13 @@ export function Sidebar() {
       </nav>
       <div className="p-3 border-t">
         <div className="flex items-center justify-between gap-2">
-          <ModeToggle />
+          <div className="flex items-center gap-2">
+            <ModeToggle />
+            <div className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
+              <span className="dark:hidden">☀️ Light</span>
+              <span className="hidden dark:inline">🌙 Dark</span>
+            </div>
+          </div>
           {session?.user ? (
             <button
               onClick={() => signOut({ callbackUrl: "/auth" })}

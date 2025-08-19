@@ -2,8 +2,6 @@
 
 import * as React from "react";
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
-
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -13,7 +11,59 @@ import {
 } from "./ui/dropdown-menu";
 
 export function ModeToggle() {
-  const { setTheme } = useTheme();
+  const [theme, setTheme] = React.useState<'light' | 'dark' | 'system'>('system');
+
+  React.useEffect(() => {
+    // Prevent hydration mismatch by checking if we're on client
+    if (typeof window === 'undefined') return;
+    
+    console.log('🚀 ThemeToggle mounted, checking localStorage...');
+    
+    // Get theme from localStorage on mount
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system';
+    console.log('💾 Saved theme from localStorage:', savedTheme);
+    
+    if (savedTheme) {
+      setTheme(savedTheme);
+      applyTheme(savedTheme);
+    } else {
+      // Check system preference
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const defaultTheme = systemPrefersDark ? 'dark' : 'light';
+      console.log('💻 System prefers dark:', systemPrefersDark, 'Default theme:', defaultTheme);
+      setTheme('system');
+      applyTheme(defaultTheme);
+    }
+  }, []);
+
+  const applyTheme = (newTheme: 'light' | 'dark') => {
+    const root = document.documentElement;
+    console.log('🎨 Applying theme:', newTheme);
+    console.log('📝 Before - HTML classes:', root.className);
+    
+    if (newTheme === 'dark') {
+      root.classList.add('dark');
+      console.log('🌙 Added dark class');
+    } else {
+      root.classList.remove('dark');
+      console.log('☀️ Removed dark class');
+    }
+    
+    console.log('📝 After - HTML classes:', root.className);
+    console.log('🔍 Dark class present:', root.classList.contains('dark'));
+  };
+
+  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    if (newTheme === 'system') {
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyTheme(systemPrefersDark ? 'dark' : 'light');
+    } else {
+      applyTheme(newTheme);
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -25,13 +75,13 @@ export function ModeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+        <DropdownMenuItem onClick={() => handleThemeChange("light")}>
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
+        <DropdownMenuItem onClick={() => handleThemeChange("dark")}>
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
+        <DropdownMenuItem onClick={() => handleThemeChange("system")}>
           System
         </DropdownMenuItem>
       </DropdownMenuContent>
