@@ -78,8 +78,11 @@ export async function updateJournalEntry(formData: FormData): Promise<void> {
   
   const { projectId, date, title, notes, tags, photoUrls, weather } = parsed.data;
 
-  // Only delete existing photos if new photos are provided
-  if (photoUrls && photoUrls.length > 0) {
+  // Always replace photos when photoUrls are provided (including empty array to clear all photos)
+  // If photoUrls is undefined/null, leave photos unchanged
+  const shouldUpdatePhotos = photoUrls !== undefined;
+
+  if (shouldUpdatePhotos) {
     // Delete existing photos
     await db.photo.deleteMany({
       where: { journalEntryId: id }
@@ -96,8 +99,8 @@ export async function updateJournalEntry(formData: FormData): Promise<void> {
       notes: notes || null,
       tags: tags ? tryParseJson(tags) : undefined,
       weather: weather ? tryParseJson(weather) : undefined,
-      // Only create new photos if they were provided, otherwise keep existing ones
-      ...(photoUrls && photoUrls.length > 0 && {
+      // Create new photos if photoUrls provided and not empty
+      ...(shouldUpdatePhotos && photoUrls.length > 0 && {
         photos: { create: photoUrls.map((url) => ({ url })) }
       }),
     },

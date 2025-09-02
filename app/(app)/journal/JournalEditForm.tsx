@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { updateJournalEntry } from "./actions";
 import { WeatherData } from "@/lib/weather";
+import { upload } from '@vercel/blob/client';
 
 interface Project {
   id: string;
@@ -44,6 +45,7 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
   const [newPhotos, setNewPhotos] = useState<File[]>([]);
   const [weatherData, setWeatherData] = useState<WeatherData | null>(entry.weather);
   const [weatherLoading, setWeatherLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleEdit = () => {
@@ -59,6 +61,11 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
   };
 
   const handleCancel = () => {
+    // Clean up object URLs to prevent memory leaks
+    newPhotos.forEach(photo => {
+      URL.revokeObjectURL(URL.createObjectURL(photo));
+    });
+    
     setIsEditing(false);
     setFormData({
       title: entry.title,
@@ -75,6 +82,9 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
   };
 
   const handleRemoveNewPhoto = (index: number) => {
+    const photoToRemove = newPhotos[index];
+    // Clean up object URL to prevent memory leak
+    URL.revokeObjectURL(URL.createObjectURL(photoToRemove));
     setNewPhotos(newPhotos.filter((_, i) => i !== index));
   };
 
@@ -121,34 +131,58 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUploading(true);
     
-    // Create FormData for the update
-    const formDataObj = new FormData();
-    formDataObj.append("id", entry.id);
-    formDataObj.append("title", formData.title);
-    formDataObj.append("notes", formData.notes);
-    formDataObj.append("date", formData.date);
-    formDataObj.append("projectId", formData.projectId);
-    
-    // Add existing photos that weren't removed
-    photos.forEach(photo => {
-      formDataObj.append("photoUrls", photo.url);
-    });
-    
-    // Add new photos
-    newPhotos.forEach(photo => {
-      formDataObj.append("photoUrls", photo);
-    });
-    
-    // Add weather data if available
-    if (weatherData) {
-      formDataObj.append("weather", JSON.stringify(weatherData));
+    try {
+      // Upload new photos first to get their URLs
+      const newPhotoUrls: string[] = [];
+      for (const file of newPhotos) {
+        const { url } = await upload(file.name, file, {
+          access: 'public',
+          handleUploadUrl: '/api/upload',
+        });
+        newPhotoUrls.push(url);
+      }
+      
+      // Create FormData for the update
+      const formDataObj = new FormData();
+      formDataObj.append("id", entry.id);
+      formDataObj.append("title", formData.title);
+      formDataObj.append("notes", formData.notes);
+      formDataObj.append("date", formData.date);
+      formDataObj.append("projectId", formData.projectId);
+      
+      // Add existing photos that weren't removed
+      photos.forEach(photo => {
+        formDataObj.append("photoUrls", photo.url);
+      });
+      
+      // Add uploaded new photo URLs
+      newPhotoUrls.forEach(url => {
+        formDataObj.append("photoUrls", url);
+      });
+      
+      // Add weather data if available
+      if (weatherData) {
+        formDataObj.append("weather", JSON.stringify(weatherData));
+      }
+      
+      await updateJournalEntry(formDataObj);
+      
+      // Clean up object URLs after successful submission
+      newPhotos.forEach(photo => {
+        URL.revokeObjectURL(URL.createObjectURL(photo));
+      });
+      
+      setIsEditing(false);
+      // Refresh the page to show updated data
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to update journal entry:', error);
+      alert('Failed to update journal entry. Please try again.');
+    } finally {
+      setUploading(false);
     }
-    
-    await updateJournalEntry(formDataObj);
-    setIsEditing(false);
-    // Refresh the page to show updated data
-    window.location.reload();
   };
 
   if (isEditing) {
@@ -290,18 +324,35 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
             <p className="text-xs text-gray-500 mt-1">Select one or more images to add</p>
           </div>
         </div>
+
+        {/* Upload status */}
+        {uploading && (
+          <div className="text-sm text-blue-600 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-3">
+            Uploading photos and saving changes...
+          </div>
+        )}
         
         <div className="flex gap-2">
           <button
             type="submit"
-            className="text-green-600 hover:underline focus:outline-none focus:ring-2 focus:ring-green-400 rounded text-sm"
+            disabled={uploading}
+            className={`text-sm focus:outline-none focus:ring-2 focus:ring-green-400 rounded ${
+              uploading 
+                ? 'text-gray-400 cursor-not-allowed' 
+                : 'text-green-600 hover:underline'
+            }`}
           >
-            Save
+            {uploading ? 'Saving...' : 'Save'}
           </button>
           <button
             type="button"
             onClick={handleCancel}
-            className="text-gray-600 hover:underline focus:outline-none focus:ring-2 focus:ring-gray-400 rounded text-sm"
+            disabled={uploading}
+            className={`text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 rounded ${
+              uploading 
+                ? 'text-gray-400 cursor-not-allowed' 
+                : 'text-gray-600 hover:underline'
+            }`}
           >
             Cancel
           </button>
