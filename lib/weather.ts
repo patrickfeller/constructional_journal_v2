@@ -94,8 +94,8 @@ export async function getWeatherForDate(
       return null;
     }
 
-    // Calculate average temperature
-    const avgTemperature = temperatures.reduce((sum, temp) => sum + temp, 0) / temperatures.length;
+    // Calculate maximum temperature (more representative for daily weather)
+    const maxTemperature = Math.max(...temperatures);
 
     // Get most common weather condition
     const weatherCodeCounts: Record<number, number> = {};
@@ -110,7 +110,7 @@ export async function getWeatherForDate(
       { description: "Unknown", icon: "❓" };
 
     return {
-      temperature: Math.round(avgTemperature),
+      temperature: Math.round(maxTemperature),
       description: weatherCondition.description,
       icon: weatherCondition.icon,
       date,
