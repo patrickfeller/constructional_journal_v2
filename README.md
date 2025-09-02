@@ -31,8 +31,6 @@ pnpm dev
 - prisma:seed: seed demo data
 
 ## ToDos:
-- add wetter API that add the current weather details for the journal entry
-- add change of name entries (people, companies,...)
-- FIX: delete projects didn't work
-- show Markdown possibility in jounal entries
 - loading spinner when, that the user knows when app is in progress
+- share project with other user to be able to add entries in a shared project of multible users
+- FIX: Dark and light mode
