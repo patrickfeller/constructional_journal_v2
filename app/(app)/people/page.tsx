@@ -3,6 +3,8 @@ import { createPerson, deletePerson } from "./actions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { PersonEditForm } from "./PersonEditForm";
+import { PersonForm } from "./PersonForm";
+import { DeletePersonButton } from "./DeletePersonButton";
 
 export default async function PeoplePage() {
   const session = await getServerSession(authOptions);
@@ -24,16 +26,7 @@ export default async function PeoplePage() {
       <h1 className="text-2xl font-semibold">People</h1>
       <section className="rounded-2xl bg-card text-card-foreground shadow-sm p-4 border">
         <h2 className="font-medium mb-2">Add person</h2>
-        <form action={createPerson} className="grid sm:grid-cols-3 gap-2 items-end">
-          <input name="name" aria-label="Name" placeholder="Name" className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" required />
-          <select name="companyId" aria-label="Company" className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800">
-            <option value="">No company</option>
-            {companies.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-          <button className="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2">Save</button>
-        </form>
+        <PersonForm companies={companies} />
       </section>
       <section className="rounded-2xl bg-card text-card-foreground shadow-sm p-4 border">
         <h2 className="font-medium mb-2">People</h2>
@@ -51,12 +44,7 @@ export default async function PeoplePage() {
                     <div className="text-sm font-medium text-muted-foreground">{toHours(totalMinutes)}h</div>
                     <div className="flex gap-2">
                       <PersonEditForm person={p} companies={companies} />
-                      <form action={deletePerson}>
-                        <input type="hidden" name="id" value={p.id} />
-                        <button className="text-red-600 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 rounded">
-                          Delete
-                        </button>
-                      </form>
+                      <DeletePersonButton personId={p.id} personName={p.name} />
                     </div>
                   </div>
                 </div>

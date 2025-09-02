@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { updateProject } from "./actions";
+import { Button } from "@/components/ui/button";
 
 interface Project {
   id: string;
@@ -17,6 +18,7 @@ interface ProjectEditFormProps {
 
 export function ProjectEditForm({ project }: ProjectEditFormProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState({
     name: project.name,
     address: project.address || ""
@@ -40,15 +42,17 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formDataObj = new FormData();
-    formDataObj.append("id", project.id);
-    formDataObj.append("name", formData.name);
-    formDataObj.append("address", formData.address);
-    
-    await updateProject(formDataObj);
-    setIsEditing(false);
-    // Refresh the page to show updated data
-    window.location.reload();
+    startTransition(async () => {
+      const formDataObj = new FormData();
+      formDataObj.append("id", project.id);
+      formDataObj.append("name", formData.name);
+      formDataObj.append("address", formData.address);
+      
+      await updateProject(formDataObj);
+      setIsEditing(false);
+      // Refresh the page to show updated data
+      window.location.reload();
+    });
   };
 
   if (isEditing) {
@@ -62,6 +66,7 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
           className="border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
           required
           aria-label="Project name"
+          disabled={isPending}
         />
         <input
           type="text"
@@ -72,30 +77,40 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
           className="border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
           aria-label="Project address"
           required
+          disabled={isPending}
         />
-        <button
+        <Button
           type="submit"
-          className="text-green-600 hover:underline focus:outline-none focus:ring-2 focus:ring-green-400 rounded text-sm"
+          variant="ghost"
+          size="sm"
+          loading={isPending}
+          loadingText="Saving..."
+          className="text-green-600 hover:text-green-700"
         >
           Save
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={handleCancel}
-          className="text-gray-600 hover:underline focus:outline-none focus:ring-2 focus:ring-gray-400 rounded text-sm"
+          disabled={isPending}
+          className="text-gray-600 hover:text-gray-700"
         >
           Cancel
-        </button>
+        </Button>
       </form>
     );
   }
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="sm"
       onClick={handleEdit}
-      className="text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+      className="text-blue-600 hover:text-blue-700"
     >
       Change
-    </button>
+    </Button>
   );
 }

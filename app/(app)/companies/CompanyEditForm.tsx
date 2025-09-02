@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { updateCompany } from "./actions";
+import { Button } from "@/components/ui/button";
 
 interface Company {
   id: string;
@@ -15,6 +16,7 @@ interface CompanyEditFormProps {
 
 export function CompanyEditForm({ company }: CompanyEditFormProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState({
     name: company.name,
     hourlyRateDefault: company.hourlyRateDefault?.toString() || ""
@@ -38,15 +40,17 @@ export function CompanyEditForm({ company }: CompanyEditFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formDataObj = new FormData();
-    formDataObj.append("id", company.id);
-    formDataObj.append("name", formData.name);
-    formDataObj.append("hourlyRateDefault", formData.hourlyRateDefault);
-    
-    await updateCompany(formDataObj);
-    setIsEditing(false);
-    // Refresh the page to show updated data
-    window.location.reload();
+    startTransition(async () => {
+      const formDataObj = new FormData();
+      formDataObj.append("id", company.id);
+      formDataObj.append("name", formData.name);
+      formDataObj.append("hourlyRateDefault", formData.hourlyRateDefault);
+      
+      await updateCompany(formDataObj);
+      setIsEditing(false);
+      // Refresh the page to show updated data
+      window.location.reload();
+    });
   };
 
   if (isEditing) {
@@ -62,6 +66,7 @@ export function CompanyEditForm({ company }: CompanyEditFormProps) {
             placeholder="Company name"
             required
             aria-label="Company name"
+            disabled={isPending}
           />
           <input
             type="number"
@@ -73,33 +78,43 @@ export function CompanyEditForm({ company }: CompanyEditFormProps) {
             step="0.01"
             min="0"
             aria-label="Default hourly rate"
+            disabled={isPending}
           />
         </div>
         <div className="flex gap-2">
-          <button
+          <Button
             type="submit"
-            className="text-green-600 hover:underline focus:outline-none focus:ring-2 focus:ring-green-400 rounded text-sm"
+            variant="ghost"
+            size="sm"
+            loading={isPending}
+            loadingText="Saving..."
+            className="text-green-600 hover:text-green-700"
           >
             Save
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={handleCancel}
-            className="text-gray-600 hover:underline focus:outline-none focus:ring-2 focus:ring-gray-400 rounded text-sm"
+            disabled={isPending}
+            className="text-gray-600 hover:text-gray-700"
           >
             Cancel
-          </button>
+          </Button>
         </div>
       </form>
     );
   }
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="sm"
       onClick={handleEdit}
-      className="text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+      className="text-blue-600 hover:text-blue-700"
     >
       Change
-    </button>
+    </Button>
   );
 }

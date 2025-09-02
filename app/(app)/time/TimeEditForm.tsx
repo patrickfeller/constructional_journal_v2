@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { updateTimeEntry } from "./actions";
+import { Button } from "@/components/ui/button";
 
 interface Project {
   id: string;
@@ -35,6 +36,7 @@ interface TimeEditFormProps {
 
 export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState({
     projectId: entry.projectId,
     personId: entry.personId || "",
@@ -73,20 +75,22 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formDataObj = new FormData();
-    formDataObj.append("id", entry.id);
-    formDataObj.append("projectId", formData.projectId);
-    formDataObj.append("personId", formData.personId);
-    formDataObj.append("date", formData.date);
-    formDataObj.append("start", formData.start);
-    formDataObj.append("end", formData.end);
-    formDataObj.append("breakMinutes", formData.breakMinutes.toString());
-    formDataObj.append("notes", formData.notes);
-    
-    await updateTimeEntry(formDataObj);
-    setIsEditing(false);
-    // Refresh the page to show updated data
-    window.location.reload();
+    startTransition(async () => {
+      const formDataObj = new FormData();
+      formDataObj.append("id", entry.id);
+      formDataObj.append("projectId", formData.projectId);
+      formDataObj.append("personId", formData.personId);
+      formDataObj.append("date", formData.date);
+      formDataObj.append("start", formData.start);
+      formDataObj.append("end", formData.end);
+      formDataObj.append("breakMinutes", formData.breakMinutes.toString());
+      formDataObj.append("notes", formData.notes);
+      
+      await updateTimeEntry(formDataObj);
+      setIsEditing(false);
+      // Refresh the page to show updated data
+      window.location.reload();
+    });
   };
 
   if (isEditing) {
@@ -100,6 +104,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
             required
             aria-label="Project"
+            disabled={isPending}
           >
             {projects.map((project) => (
               <option key={project.id} value={project.id}>
@@ -113,6 +118,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             onChange={(e) => setFormData({ ...formData, personId: e.target.value })}
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
             aria-label="Person"
+            disabled={isPending}
           >
             <option value="">No person</option>
             {people.map((person) => (
@@ -131,6 +137,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
             required
             aria-label="Date"
+            disabled={isPending}
           />
           <input
             type="time"
@@ -140,6 +147,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
             required
             aria-label="Start time"
+            disabled={isPending}
           />
           <input
             type="time"
@@ -149,6 +157,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
             required
             aria-label="End time"
+            disabled={isPending}
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -161,6 +170,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
             placeholder="Break (mins)"
             aria-label="Break minutes"
+            disabled={isPending}
           />
           <input
             name="notes"
@@ -169,33 +179,43 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             placeholder="Notes (optional)"
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
             aria-label="Notes"
+            disabled={isPending}
           />
         </div>
         <div className="flex gap-2">
-          <button
+          <Button
             type="submit"
-            className="text-green-600 hover:underline focus:outline-none focus:ring-2 focus:ring-green-400 rounded text-sm"
+            variant="ghost"
+            size="sm"
+            loading={isPending}
+            loadingText="Saving..."
+            className="text-green-600 hover:text-green-700"
           >
             Save
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={handleCancel}
-            className="text-gray-600 hover:underline focus:outline-none focus:ring-2 focus:ring-gray-400 rounded text-sm"
+            disabled={isPending}
+            className="text-gray-600 hover:text-gray-700"
           >
             Cancel
-          </button>
+          </Button>
         </div>
       </form>
     );
   }
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="sm"
       onClick={handleEdit}
-      className="text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+      className="text-blue-600 hover:text-blue-700"
     >
       Change
-    </button>
+    </Button>
   );
 }

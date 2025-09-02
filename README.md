@@ -31,6 +31,5 @@ pnpm dev
 - prisma:seed: seed demo data
 
 ## ToDos:
-- loading spinner when, that the user knows when app is in progress
 - share project with other user to be able to add entries in a shared project of multible users
 - FIX: Dark and light mode

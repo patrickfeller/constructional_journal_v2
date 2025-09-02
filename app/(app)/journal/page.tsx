@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { JournalForm } from "./JournalForm";
 import { JournalEditForm } from "./JournalEditForm";
+import { DeleteEntryButton } from "./DeleteEntryButton";
 import ReactMarkdown from 'react-markdown';
 
 export default async function JournalListPage() {
@@ -21,6 +22,8 @@ export default async function JournalListPage() {
       select: { projectId: true }
     }),
   ]);
+  
+
   const today = new Date().toISOString().slice(0, 10);
 
   return (
@@ -50,21 +53,16 @@ export default async function JournalListPage() {
                       {new Date(e.date).toLocaleDateString()}
                     </div>
                     {/* Weather Display */}
-                    {e.weather && typeof e.weather === 'object' && e.weather !== null && 'icon' in e.weather && 'temperature' in e.weather && (
+                    {e.weather && typeof e.weather === 'object' && e.weather !== null && (
                       <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        <span>{(e.weather as any).icon}</span>
+                        <span>{(e.weather as any).icon || '🌡️'}</span>
                         <span>{(e.weather as any).temperature}°C</span>
                       </div>
                     )}
                   </div>
                   <div className="flex gap-2">
                     <JournalEditForm entry={e} projects={projects} />
-                    <form action={deleteJournalEntry}>
-                      <input type="hidden" name="id" value={e.id} />
-                      <button className="text-red-600 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 rounded">
-                        Delete
-                      </button>
-                    </form>
+                    <DeleteEntryButton entryId={e.id} entryTitle={e.title} />
                   </div>
                 </div>
               </div>

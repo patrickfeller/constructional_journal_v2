@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useTransition } from "react";
 import { upload } from '@vercel/blob/client';
 import { WeatherData } from "@/lib/weather";
+import { Button } from "@/components/ui/button";
+import { createJournalEntry } from "./actions";
 
 interface JournalFormProps {
   projects: any[];
@@ -17,6 +19,7 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
   const [selectedDate, setSelectedDate] = useState(today);
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const handlePhotoUpload = async (files: FileList) => {
     if (!files.length) return;
@@ -72,8 +75,23 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
     }
   }, [selectedProjectId, selectedDate, projects]);
 
+  const handleSubmit = async (formData: FormData) => {
+    startTransition(async () => {
+      try {
+        await createJournalEntry(formData);
+        // Reset form
+        setUploadedUrls([]);
+        setWeatherData(null);
+        // Refresh the page to show the new entry
+        window.location.reload();
+      } catch (error) {
+        console.error('Error creating journal entry:', error);
+      }
+    });
+  };
+
   return (
-    <form action="/api/journal" method="POST" className="grid gap-3">
+    <form action={handleSubmit} className="grid gap-3">
       <div className="grid sm:grid-cols-3 gap-2">
         <select 
           name="projectId" 
@@ -82,6 +100,7 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
           onChange={(e) => setSelectedProjectId(e.target.value)}
           className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
           required
+          disabled={isPending}
         >
           <option value="">Select project</option>
           {projects.map((p) => (
@@ -96,10 +115,23 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
           onChange={(e) => setSelectedDate(e.target.value)}
           className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
           required 
+          disabled={isPending}
         />
-        <input name="title" placeholder="Title" className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" required />
+        <input 
+          name="title" 
+          placeholder="Title" 
+          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+          required 
+          disabled={isPending}
+        />
       </div>
-      <textarea name="notes" aria-label="Notes" placeholder="Notes (Markdown supported)" className="border rounded-md px-3 py-2 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" />
+      <textarea 
+        name="notes" 
+        aria-label="Notes" 
+        placeholder="Notes (Markdown supported)" 
+        className="border rounded-md px-3 py-2 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+        disabled={isPending}
+      />
       
       {/* Weather Information */}
       {weatherLoading && (
@@ -130,6 +162,7 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
           multiple 
           onChange={(e) => e.target.files && handlePhotoUpload(e.target.files)}
           className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+          disabled={isPending || uploading}
         />
         {uploading && <div className="text-sm text-gray-600">Uploading photos...</div>}
         {uploadedUrls.length > 0 && (
@@ -144,7 +177,15 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
         <input key={index} type="hidden" name="photoUrls" value={url} />
       ))}
 
-      <button className="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 w-fit">Add Entry</button>
+      <Button 
+        type="submit"
+        loading={isPending}
+        loadingText="Adding entry..."
+        disabled={isPending || uploading}
+        className="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 w-fit"
+      >
+        Add Entry
+      </Button>
     </form>
   );
 }
