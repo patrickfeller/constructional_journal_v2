@@ -25,7 +25,12 @@ export function ModeToggle() {
     
     if (savedTheme) {
       setTheme(savedTheme);
-      applyTheme(savedTheme);
+      if (savedTheme === 'system') {
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyTheme(systemPrefersDark ? 'dark' : 'light');
+      } else {
+        applyTheme(savedTheme);
+      }
     } else {
       // Check system preference
       const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
