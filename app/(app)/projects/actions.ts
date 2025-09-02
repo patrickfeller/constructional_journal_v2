@@ -55,7 +55,50 @@ export async function deleteProject(formData: FormData): Promise<void> {
   const userId = (session?.user as any)?.id;
   const id = String(formData.get("id"));
   if (!id || !userId) return;
-  await db.project.delete({ where: { id, userId } as any });
+  
+  // Use a transaction to ensure all deletions succeed or fail together
+  await db.$transaction(async (tx) => {
+    // First, delete all photos associated with journal entries for this project
+    const journalEntries = await tx.journalEntry.findMany({
+      where: { projectId: id, userId },
+      select: { id: true }
+    });
+    
+    if (journalEntries.length > 0) {
+      const journalEntryIds = journalEntries.map(entry => entry.id);
+      
+      // Delete photos first (they reference journal entries)
+      await tx.photo.deleteMany({
+        where: { journalEntryId: { in: journalEntryIds } }
+      });
+    }
+    
+    // Delete timers associated with time entries for this project
+    await tx.timer.deleteMany({
+      where: {
+        timeEntry: {
+          projectId: id,
+          userId
+        }
+      }
+    });
+    
+    // Delete time entries for this project
+    await tx.timeEntry.deleteMany({
+      where: { projectId: id, userId }
+    });
+    
+    // Delete journal entries for this project
+    await tx.journalEntry.deleteMany({
+      where: { projectId: id, userId }
+    });
+    
+    // Finally, delete the project itself
+    await tx.project.delete({ 
+      where: { id, userId } as any 
+    });
+  });
+  
   revalidatePath("/projects");
 }
 
