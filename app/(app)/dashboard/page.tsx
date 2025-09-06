@@ -3,6 +3,7 @@ import { DashboardTimeChart, type TimePoint } from "@/components/DashboardTimeCh
 import { DashboardFilters } from "@/components/DashboardFilters";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getUserAccessibleProjects } from "@/lib/project-permissions";
 
 function startOfDay(d: Date) { d.setHours(0,0,0,0); return d; }
 function addDays(d: Date, days: number) { const x = new Date(d); x.setDate(x.getDate()+days); return x; }
@@ -15,25 +16,65 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const weekStart = startOfDay(addDays(new Date(now), -now.getDay()));
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const whereBase: any = userId ? { userId } : {};
-  if (resolved?.projectId) whereBase.projectId = resolved.projectId;
+  // Get all projects user has access to (owned + shared)
+  const accessibleProjects = await getUserAccessibleProjects(userId);
+  const accessibleProjectIds = accessibleProjects.map(p => p.id);
+
+  // Build base where clause that includes accessible projects
+  const whereBase: any = userId ? {
+    OR: [
+      { userId }, // User's own entries
+      { projectId: { in: accessibleProjectIds } } // Entries in accessible projects
+    ]
+  } : {};
+  
+  // Apply additional filters if provided
+  if (resolved?.projectId) {
+    whereBase.projectId = resolved.projectId;
+    delete whereBase.OR; // When filtering by specific project, remove OR clause
+  }
   if (resolved?.personId) whereBase.personId = resolved.personId;
   if (resolved?.companyId) whereBase.companyId = resolved.companyId;
+
+  // Build journal where clause for journal entry count
+  const journalWhereClause = userId ? {
+    OR: [
+      { userId }, // User's own entries
+      { projectId: { in: accessibleProjectIds } } // Entries in accessible projects
+    ]
+  } : undefined;
 
   const [all, week, month, entriesCount] = await Promise.all([
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: whereBase }),
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...whereBase, date: { gte: weekStart } } }),
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...whereBase, date: { gte: monthStart } } }),
-    db.journalEntry.count({ where: userId ? { userId } : undefined }),
+    db.journalEntry.count({ where: journalWhereClause }),
   ]);
 
   const toHours = (mins?: number | null) => ((mins ?? 0) / 60).toFixed(1);
 
   const hoursByProject = await db.timeEntry.groupBy({ by: ["projectId"], _sum: { durationMinutes: true }, where: whereBase });
+  
+  // Get people and companies from all accessible projects
+  const peopleWhereClause = userId ? {
+    OR: [
+      { userId }, // User's legacy personal people (if any still exist)
+      { projectId: { in: accessibleProjectIds } } // People in accessible projects
+    ]
+  } : undefined;
+
+  const companiesWhereClause = userId ? {
+    OR: [
+      { userId }, // User's legacy personal companies (if any still exist)
+      { projectId: { in: accessibleProjectIds } } // Companies in accessible projects
+    ]
+  } : undefined;
+
   const [projects, people, companies] = await Promise.all([
-    db.project.findMany({ where: userId ? ({ userId } as any) : undefined, orderBy: { name: "asc" } }),
-    db.person.findMany({ where: userId ? ({ userId } as any) : undefined, orderBy: { name: "asc" } }),
-    db.company.findMany({ where: userId ? ({ userId } as any) : undefined, orderBy: { name: "asc" } }),
+    // Return accessible projects with role information
+    Promise.resolve(accessibleProjects),
+    db.person.findMany({ where: peopleWhereClause, orderBy: { name: "asc" } }),
+    db.company.findMany({ where: companiesWhereClause, orderBy: { name: "asc" } }),
   ]);
   const projectMap = new Map(projects.map(p => [p.id, p.name] as const));
 

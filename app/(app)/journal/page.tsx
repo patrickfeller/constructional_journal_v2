@@ -8,16 +8,35 @@ import { JournalForm } from "./JournalForm";
 import { JournalEditForm } from "./JournalEditForm";
 import { DeleteEntryButton } from "./DeleteEntryButton";
 import ReactMarkdown from 'react-markdown';
+import { getUserAccessibleProjects } from "@/lib/project-permissions";
 
 export default async function JournalListPage() {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
+  
+  // Get all projects user has access to (owned + shared)
+  const accessibleProjects = await getUserAccessibleProjects(userId);
+  const accessibleProjectIds = accessibleProjects.map(p => p.id);
+
+  // Build where clause for journal entries  
+  const journalWhereClause = {
+    OR: [
+      { userId }, // User's own entries
+      { projectId: { in: accessibleProjectIds } } // Entries in accessible projects
+    ]
+  };
+
   const [projects, entries, lastUsedProject] = await Promise.all([
-    db.project.findMany({ where: userId ? ({ userId } as any) : undefined, orderBy: { name: "asc" } }),
-    db.journalEntry.findMany({ where: userId ? { userId } : undefined, include: { photos: true, project: true }, orderBy: { date: "desc" } }),
+    // Return accessible projects with role information
+    Promise.resolve(accessibleProjects),
+    db.journalEntry.findMany({ 
+      where: userId ? journalWhereClause : undefined, 
+      include: { photos: true, project: true, author: { select: { name: true, id: true } } }, 
+      orderBy: { date: "desc" } 
+    }),
     // Get the last used project from the most recent journal entry
     db.journalEntry.findFirst({ 
-      where: userId ? { userId } : undefined, 
+      where: userId ? journalWhereClause : undefined, 
       orderBy: { createdAt: "desc" },
       select: { projectId: true }
     }),
@@ -42,6 +61,11 @@ export default async function JournalListPage() {
                 <div className="flex-1 min-w-0">
                   <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                     {e.project.name}
+                    {e.author.id !== userId && (
+                      <span className="ml-2 text-blue-600 dark:text-blue-400">
+                        by {e.author.name}
+                      </span>
+                    )}
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {e.title}

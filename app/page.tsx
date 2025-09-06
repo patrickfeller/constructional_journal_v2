@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getUserAccessibleProjects } from "@/lib/project-permissions";
 
 function startOfDay(d: Date) { d.setHours(0,0,0,0); return d; }
 function addDays(d: Date, days: number) { const x = new Date(d); x.setDate(x.getDate()+days); return x; }
@@ -26,26 +27,44 @@ export default async function Home() {
     );
   }
 
-  const whereBase = { userId } as any;
+  // Get all projects user has access to (owned + shared)
+  const accessibleProjects = await getUserAccessibleProjects(userId);
+  const accessibleProjectIds = accessibleProjects.map(p => p.id);
+
+  // Build where clauses for time entries (include user's own entries + entries in accessible projects)
+  const timeWhereClause = {
+    OR: [
+      { userId }, // User's own entries
+      { projectId: { in: accessibleProjectIds } } // Entries in accessible projects
+    ]
+  };
+
+  // Build where clauses for journal entries  
+  const journalWhereClause = {
+    OR: [
+      { userId }, // User's own entries
+      { projectId: { in: accessibleProjectIds } } // Entries in accessible projects
+    ]
+  };
 
   const [all, week, month, entriesCount] = await Promise.all([
-    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: whereBase }),
-    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...whereBase, date: { gte: weekStart } } }),
-    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...whereBase, date: { gte: monthStart } } }),
-    db.journalEntry.count({ where: { userId } as any }),
+    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: timeWhereClause }),
+    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...timeWhereClause, date: { gte: weekStart } } }),
+    db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...timeWhereClause, date: { gte: monthStart } } }),
+    db.journalEntry.count({ where: journalWhereClause }),
   ]);
 
   const toHours = (mins?: number | null) => ((mins ?? 0) / 60).toFixed(1);
 
   const [recentTime, recentJournal] = await Promise.all([
     db.timeEntry.findMany({
-      where: whereBase,
+      where: timeWhereClause,
       include: { project: true, person: true },
       orderBy: { date: "desc" },
       take: 5,
     }),
     db.journalEntry.findMany({
-      where: { userId } as any,
+      where: journalWhereClause,
       include: { project: true },
       orderBy: { date: "desc" },
       take: 5,
