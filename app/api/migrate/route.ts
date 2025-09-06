@@ -1,18 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
-
 export async function POST(request: NextRequest) {
-  // Add a simple security check
-  const authHeader = request.headers.get('authorization');
-  const expectedToken = process.env.MIGRATION_SECRET || 'your-secret-token';
+  let prisma: PrismaClient;
   
-  if (authHeader !== `Bearer ${expectedToken}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   try {
+    // Initialize Prisma client
+    prisma = new PrismaClient();
+    
+    // Check database connection
+    await prisma.$connect();
+    console.log('Database connected successfully');
+    
+    // Add a simple security check
+    const authHeader = request.headers.get('authorization');
+    const expectedToken = process.env.MIGRATION_SECRET || 'your-secret-token';
+    
+    if (authHeader !== `Bearer ${expectedToken}`) {
+      await prisma.$disconnect();
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     console.log('Starting migration to project-scoped resources...');
 
     // Step 1: Creating ProjectMember entries for existing project owners
@@ -170,11 +177,16 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Migration failed:', error);
+    if (prisma) {
+      await prisma.$disconnect();
+    }
     return NextResponse.json({ 
       error: 'Migration failed', 
       details: error instanceof Error ? error.message : 'Unknown error' 
     }, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    if (prisma) {
+      await prisma.$disconnect();
+    }
   }
 }
