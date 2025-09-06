@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,53 +7,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  OWNER
-  EDITOR
-  VIEWER
-}
-
-enum TimeMode {
-  timer
-  manual
-}
-
 model User {
-  id            String   @id @default(cuid())
-  name          String?
-  email         String?  @unique
-  emailVerified DateTime?
-  image         String?
-  role          Role     @default(VIEWER)
-  passwordHash  String?
-  createdAt     DateTime @default(now())
-
-  // NextAuth relations
-  accounts Account[]
-  sessions Session[]
-
-  // Reverse relations
-  journalEntries JournalEntry[] @relation("UserJournalEntries")
-  projects       Project[]       @relation("UserProjects")
-  companies      Company[]       @relation("UserCompanies")
-  people         Person[]        @relation("UserPeople")
-  timeEntries    TimeEntry[]     @relation("UserTimeEntries")
+  id                 String            @id @default(cuid())
+  name               String?
+  email              String?           @unique
+  emailVerified      DateTime?
+  image              String?
+  role               Role              @default(VIEWER)
+  passwordHash       String?
+  createdAt          DateTime          @default(now())
+  accounts           Account[]
+  addedCompanies     Company[]         @relation("UserAddedCompanies")
+  companies          Company[]         @relation("UserCompanies")
+  journalEntries     JournalEntry[]    @relation("UserJournalEntries")
+  addedPeople        Person[]          @relation("UserAddedPeople")
+  people             Person[]          @relation("UserPeople")
+  personalCompanies  PersonalCompany[] @relation("UserPersonalCompanies")
+  personalPeople     PersonalPerson[]  @relation("UserPersonalPeople")
+  projects           Project[]         @relation("UserProjects")
+  invitedMembers     ProjectMember[]   @relation("UserInvitedMembers")
+  projectMemberships ProjectMember[]   @relation("UserProjectMemberships")
+  sessions           Session[]
+  timeEntries        TimeEntry[]       @relation("UserTimeEntries")
 
   @@index([role])
 }
 
 model Project {
-  id        String   @id @default(cuid())
-  name      String
-  address   String?
-  latitude  Float?
-  longitude Float?
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  userId    String?
-  owner     User?    @relation("UserProjects", fields: [userId], references: [id])
-
+  id             String          @id @default(cuid())
+  name           String
+  address        String?
+  active         Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  userId         String?
+  latitude       Float?
+  longitude      Float?
+  companies      Company[]       @relation("ProjectCompanies")
   journalEntries JournalEntry[]
+  people         Person[]        @relation("ProjectPeople")
+  owner          User?           @relation("UserProjects", fields: [userId], references: [id])
+  members        ProjectMember[] @relation("ProjectMembers")
   timeEntries    TimeEntry[]
 
   @@index([active])
@@ -65,52 +55,65 @@ model Project {
 }
 
 model Company {
-  id                 String   @id @default(cuid())
-  name               String   @unique
-  hourlyRateDefault  Decimal?
-  createdAt          DateTime @default(now())
-  userId             String?
-  owner              User?    @relation("UserCompanies", fields: [userId], references: [id])
-
-  people      Person[]
-  timeEntries TimeEntry[]
+  id                      String           @id @default(cuid())
+  name                    String
+  hourlyRateDefault       Decimal?
+  createdAt               DateTime         @default(now())
+  userId                  String?
+  addedAt                 DateTime         @default(now())
+  addedBy                 String?
+  projectId               String?
+  sourcePersonalCompanyId String?
+  addedByUser             User?            @relation("UserAddedCompanies", fields: [addedBy], references: [id])
+  project                 Project?         @relation("ProjectCompanies", fields: [projectId], references: [id])
+  sourcePersonalCompany   PersonalCompany? @relation("PersonalCompanySource", fields: [sourcePersonalCompanyId], references: [id])
+  owner                   User?            @relation("UserCompanies", fields: [userId], references: [id])
+  people                  Person[]
+  timeEntries             TimeEntry[]
 
   @@index([name])
   @@index([userId])
+  @@index([projectId])
 }
 
 model Person {
-  id          String   @id @default(cuid())
-  name        String
-  hourlyRate  Decimal?
-  companyId   String?
-  company     Company? @relation(fields: [companyId], references: [id])
-  createdAt   DateTime @default(now())
-  userId      String?
-  owner       User?    @relation("UserPeople", fields: [userId], references: [id])
-
-  timeEntries TimeEntry[]
+  id                     String          @id @default(cuid())
+  name                   String
+  hourlyRate             Decimal?
+  companyId              String?
+  createdAt              DateTime        @default(now())
+  userId                 String?
+  addedAt                DateTime        @default(now())
+  addedBy                String?
+  projectId              String?
+  sourcePersonalPersonId String?
+  addedByUser            User?           @relation("UserAddedPeople", fields: [addedBy], references: [id])
+  company                Company?        @relation(fields: [companyId], references: [id])
+  project                Project?        @relation("ProjectPeople", fields: [projectId], references: [id])
+  sourcePersonalPerson   PersonalPerson? @relation("PersonalPersonSource", fields: [sourcePersonalPersonId], references: [id])
+  owner                  User?           @relation("UserPeople", fields: [userId], references: [id])
+  timeEntries            TimeEntry[]
 
   @@index([companyId])
   @@index([name])
   @@index([userId])
+  @@index([projectId])
 }
 
 model JournalEntry {
-  id         String   @id @default(cuid())
-  projectId  String
-  project    Project  @relation(fields: [projectId], references: [id])
-  userId     String
-  author     User     @relation("UserJournalEntries", fields: [userId], references: [id])
-  date       DateTime
-  title      String
-  notes      String?
-  tags       Json?
-  weather    Json?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  photos     Photo[]
+  id          String      @id @default(cuid())
+  projectId   String
+  userId      String
+  date        DateTime
+  title       String
+  notes       String?
+  tags        Json?
+  weather     Json?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  project     Project     @relation(fields: [projectId], references: [id])
+  author      User        @relation("UserJournalEntries", fields: [userId], references: [id])
+  photos      Photo[]
   timeEntries TimeEntry[]
 
   @@index([projectId])
@@ -118,38 +121,37 @@ model JournalEntry {
 }
 
 model Photo {
-  id             String        @id @default(cuid())
+  id             String       @id @default(cuid())
   journalEntryId String
-  journalEntry   JournalEntry  @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
   url            String
   caption        String?
-  createdAt      DateTime @default(now())
+  createdAt      DateTime     @default(now())
+  journalEntry   JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
 
   @@index([journalEntryId])
 }
 
 model TimeEntry {
-  id               String     @id @default(cuid())
-  projectId        String
-  project          Project    @relation(fields: [projectId], references: [id])
-  personId         String?
-  person           Person?    @relation(fields: [personId], references: [id])
-  companyId        String?
-  company          Company?   @relation(fields: [companyId], references: [id])
-  journalEntryId   String?
-  journalEntry     JournalEntry? @relation(fields: [journalEntryId], references: [id], onDelete: SetNull)
-  mode             TimeMode
-  date             DateTime
-  startAt          DateTime?
-  endAt            DateTime?
-  breakMinutes     Int?       @default(0)
-  durationMinutes  Int        @default(0)
-  notes            String?
-  createdAt        DateTime   @default(now())
-  userId           String?
-  owner            User?      @relation("UserTimeEntries", fields: [userId], references: [id])
-
-  timer            Timer?
+  id              String        @id @default(cuid())
+  projectId       String
+  personId        String?
+  companyId       String?
+  journalEntryId  String?
+  mode            TimeMode
+  date            DateTime
+  startAt         DateTime?
+  endAt           DateTime?
+  breakMinutes    Int?          @default(0)
+  durationMinutes Int           @default(0)
+  notes           String?
+  createdAt       DateTime      @default(now())
+  userId          String?
+  company         Company?      @relation(fields: [companyId], references: [id])
+  journalEntry    JournalEntry? @relation(fields: [journalEntryId], references: [id])
+  person          Person?       @relation(fields: [personId], references: [id])
+  project         Project       @relation(fields: [projectId], references: [id])
+  owner           User?         @relation("UserTimeEntries", fields: [userId], references: [id])
+  timer           Timer?
 
   @@index([projectId])
   @@index([date])
@@ -161,12 +163,64 @@ model TimeEntry {
 model Timer {
   id          String    @id @default(cuid())
   timeEntryId String    @unique
-  timeEntry   TimeEntry @relation(fields: [timeEntryId], references: [id], onDelete: Cascade)
   startedAt   DateTime
   stoppedAt   DateTime?
+  timeEntry   TimeEntry @relation(fields: [timeEntryId], references: [id], onDelete: Cascade)
 }
 
-// NextAuth models (required by Prisma Adapter)
+model ProjectMember {
+  id        String      @id @default(cuid())
+  projectId String
+  userId    String
+  role      ProjectRole
+  invitedBy String?
+  invitedAt DateTime    @default(now())
+  joinedAt  DateTime?
+  createdAt DateTime    @default(now())
+  inviter   User?       @relation("UserInvitedMembers", fields: [invitedBy], references: [id])
+  project   Project     @relation("ProjectMembers", fields: [projectId], references: [id], onDelete: Cascade)
+  user      User        @relation("UserProjectMemberships", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@index([projectId])
+}
+
+model PersonalPerson {
+  id               String           @id @default(cuid())
+  userId           String
+  name             String
+  hourlyRate       Decimal?
+  defaultCompanyId String?
+  notes            String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  projectEntries   Person[]         @relation("PersonalPersonSource")
+  defaultCompany   PersonalCompany? @relation("PersonalPersonCompany", fields: [defaultCompanyId], references: [id])
+  user             User             @relation("UserPersonalPeople", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([name])
+}
+
+model PersonalCompany {
+  id                String           @id @default(cuid())
+  userId            String
+  name              String
+  hourlyRateDefault Decimal?
+  address           String?
+  contactInfo       Json?
+  notes             String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  projectEntries    Company[]        @relation("PersonalCompanySource")
+  user              User             @relation("UserPersonalCompanies", fields: [userId], references: [id], onDelete: Cascade)
+  people            PersonalPerson[] @relation("PersonalPersonCompany")
+
+  @@index([userId])
+  @@index([name])
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -180,8 +234,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -191,8 +244,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -201,4 +253,21 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum ProjectRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum TimeMode {
+  timer
+  manual
 }

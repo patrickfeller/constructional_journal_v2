@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BookText, Timer, BarChart3, Settings, Users, Building2, Folder } from "lucide-react";
+import { Home, BookText, Timer, BarChart3, Settings, Users, Building2, Folder, UserCog } from "lucide-react";
 import { ModeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
 import { useSession, signOut } from "next-auth/react";
@@ -13,8 +13,7 @@ const links = [
   { href: "/journal", label: "Journal", Icon: BookText },
   { href: "/time", label: "Time", Icon: Timer },
   { href: "/dashboard", label: "Dashboard", Icon: BarChart3 },
-  { href: "/people", label: "People", Icon: Users },
-  { href: "/companies", label: "Companies", Icon: Building2 },
+  { href: "/personal-lists", label: "My Lists", Icon: UserCog },
   { href: "/settings", label: "Settings", Icon: Settings },
 ];
 
