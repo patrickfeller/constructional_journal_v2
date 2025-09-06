@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
-  let prisma: PrismaClient;
+  let prisma: PrismaClient | undefined = undefined;
   
   try {
     // Initialize Prisma client
