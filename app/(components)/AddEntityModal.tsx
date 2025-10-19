@@ -1,24 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Clock, BookText, User, Building2, FolderKanban, X } from "lucide-react";
+import { Clock, BookText, User, Building2, FolderKanban, X, Receipt } from "lucide-react";
 import { Dialog, DialogHeader, DialogTitle, DialogBody } from "./ui/dialog";
 import { TimeForm } from "../(app)/time/TimeForm";
 import { JournalForm } from "../(app)/journal/JournalForm";
 import { PersonForm } from "../(app)/people/PersonForm";
 import { CompanyForm } from "../(app)/companies/CompanyForm";
 import { ProjectForm } from "../(app)/projects/ProjectForm";
+import { ExpenseForm } from "../(app)/expenses/ExpenseForm";
 
 interface AddEntityModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-type EntityType = "time" | "journal" | "person" | "company" | "project" | null;
+type EntityType = "time" | "journal" | "person" | "company" | "project" | "expense" | null;
 
 const menuItems = [
   { type: "time" as const, label: "Time", icon: Clock, color: "bg-blue-500" },
   { type: "journal" as const, label: "Journal", icon: BookText, color: "bg-green-500" },
+  { type: "expense" as const, label: "Expense", icon: Receipt, color: "bg-yellow-500" },
   { type: "person" as const, label: "Person", icon: User, color: "bg-purple-500" },
   { type: "company" as const, label: "Company", icon: Building2, color: "bg-orange-500" },
   { type: "project" as const, label: "Project", icon: FolderKanban, color: "bg-pink-500" },
@@ -174,6 +176,14 @@ export function AddEntityModal({ isOpen, onClose }: AddEntityModalProps) {
         {selectedType === "project" && (
           <ProjectFormWrapper onSuccess={handleFormSuccess} />
         )}
+        {selectedType === "expense" && data && (
+          <ExpenseFormWrapper
+            projects={data.projects}
+            companies={data.companies}
+            today={today}
+            onSuccess={handleFormSuccess}
+          />
+        )}
       </DialogBody>
     </Dialog>
   );
@@ -216,6 +226,14 @@ function ProjectFormWrapper({ onSuccess }: any) {
   return (
     <div className="space-y-4">
       <ProjectForm />
+    </div>
+  );
+}
+
+function ExpenseFormWrapper({ projects, companies, today, onSuccess }: any) {
+  return (
+    <div className="space-y-4">
+      <ExpenseForm projects={projects} companies={companies} today={today} />
     </div>
   );
 }

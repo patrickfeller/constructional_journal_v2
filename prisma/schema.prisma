@@ -29,6 +29,7 @@ model User {
   projectMemberships ProjectMember[]   @relation("UserProjectMemberships")
   sessions           Session[]
   timeEntries        TimeEntry[]       @relation("UserTimeEntries")
+  expenses           Expense[]         @relation("UserExpenses")
 
   @@index([role])
 }
@@ -48,6 +49,7 @@ model Project {
   owner          User?           @relation("UserProjects", fields: [userId], references: [id])
   members        ProjectMember[] @relation("ProjectMembers")
   timeEntries    TimeEntry[]
+  expenses       Expense[]
 
   @@index([active])
   @@index([name])
@@ -158,6 +160,26 @@ model TimeEntry {
   @@index([personId])
   @@index([companyId])
   @@index([userId])
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String
+  amount      Decimal
+  description String
+  company     String
+  companyId   String?
+  invoiceUrl  String?
+  date        DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  project     Project  @relation(fields: [projectId], references: [id])
+  createdBy   User     @relation("UserExpenses", fields: [userId], references: [id])
+
+  @@index([projectId])
+  @@index([userId])
+  @@index([date])
 }
 
 model Timer {

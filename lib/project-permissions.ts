@@ -224,3 +224,22 @@ export async function canEditTimeEntry(userId: string, entryId: string): Promise
   const permissions = await checkProjectPermissions(userId, entry.projectId);
   return permissions.role === 'OWNER' || permissions.role === 'EDITOR';
 }
+
+/**
+ * Check if user can edit a specific expense
+ */
+export async function canEditExpense(userId: string, expenseId: string): Promise<boolean> {
+  const expense = await db.expense.findUnique({
+    where: { id: expenseId },
+    select: { userId: true, projectId: true }
+  });
+
+  if (!expense) return false;
+
+  // Can edit if it's their own expense
+  if (expense.userId === userId) return true;
+
+  // Can edit if they're project owner or editor
+  const permissions = await checkProjectPermissions(userId, expense.projectId);
+  return permissions.role === 'OWNER' || permissions.role === 'EDITOR';
+}

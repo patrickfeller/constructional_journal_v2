@@ -47,14 +47,28 @@ export default async function Home() {
     ]
   };
 
-  const [all, week, month, entriesCount] = await Promise.all([
+  // Build where clause for expenses
+  const expenseWhereClause = {
+    projectId: { in: accessibleProjectIds }
+  };
+
+  const [all, week, month, entriesCount, totalExpenses] = await Promise.all([
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: timeWhereClause }),
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...timeWhereClause, date: { gte: weekStart } } }),
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...timeWhereClause, date: { gte: monthStart } } }),
     db.journalEntry.count({ where: journalWhereClause }),
+    db.expense.aggregate({ _sum: { amount: true }, where: expenseWhereClause }),
   ]);
 
   const toHours = (mins?: number | null) => ((mins ?? 0) / 60).toFixed(1);
+  
+  const formatCurrency = (amount: any) => {
+    const num = Number(amount || 0);
+    return new Intl.NumberFormat('en-EU', {
+      style: 'currency',
+      currency: 'EUR',
+    }).format(num);
+  };
 
   const [recentTime, recentJournal] = await Promise.all([
     db.timeEntry.findMany({
@@ -92,7 +106,7 @@ export default async function Home() {
 
   return (
     <main className="p-6 max-w-5xl mx-auto space-y-6">
-      <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <section className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -131,6 +145,16 @@ export default async function Home() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{entriesCount}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Expenses
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(totalExpenses._sum?.amount)}</div>
           </CardContent>
         </Card>
       </section>

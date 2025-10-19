@@ -44,16 +44,33 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     ]
   } : undefined;
 
-  const [all, week, month, entriesCount] = await Promise.all([
+  // Build where clause for expenses
+  const expenseWhereClause = userId ? {
+    projectId: { in: accessibleProjectIds }
+  } : {};
+
+  const [all, week, month, entriesCount, expensesAll, expensesWeek, expensesMonth] = await Promise.all([
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: whereBase }),
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...whereBase, date: { gte: weekStart } } }),
     db.timeEntry.aggregate({ _sum: { durationMinutes: true }, where: { ...whereBase, date: { gte: monthStart } } }),
     db.journalEntry.count({ where: journalWhereClause }),
+    db.expense.aggregate({ _sum: { amount: true }, where: expenseWhereClause }),
+    db.expense.aggregate({ _sum: { amount: true }, where: { ...expenseWhereClause, date: { gte: weekStart } } }),
+    db.expense.aggregate({ _sum: { amount: true }, where: { ...expenseWhereClause, date: { gte: monthStart } } }),
   ]);
 
   const toHours = (mins?: number | null) => ((mins ?? 0) / 60).toFixed(1);
+  
+  const formatCurrency = (amount: any) => {
+    const num = Number(amount || 0);
+    return new Intl.NumberFormat('en-EU', {
+      style: 'currency',
+      currency: 'EUR',
+    }).format(num);
+  };
 
   const hoursByProject = await db.timeEntry.groupBy({ by: ["projectId"], _sum: { durationMinutes: true }, where: whereBase });
+  const expensesByProject = await db.expense.groupBy({ by: ["projectId"], _sum: { amount: true }, where: expenseWhereClause });
   
   // Get people and companies from all accessible projects
   const peopleWhereClause = userId ? {
@@ -99,11 +116,20 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   return (
     <main className="p-6 max-w-6xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold">Dashboard</h1>
+      
+      <h2 className="text-lg font-semibold">Time Tracking</h2>
       <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card label="Hours this week" value={toHours(week._sum.durationMinutes)} />
         <Card label="Hours this month" value={toHours(month._sum.durationMinutes)} />
         <Card label="All-time hours" value={toHours(all._sum.durationMinutes)} />
         <Card label="Journal entries" value={String(entriesCount)} />
+      </section>
+      
+      <h2 className="text-lg font-semibold mt-6">Expenses</h2>
+      <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Card label="Expenses this week" value={formatCurrency(expensesWeek._sum.amount)} />
+        <Card label="Expenses this month" value={formatCurrency(expensesMonth._sum.amount)} />
+        <Card label="Total expenses" value={formatCurrency(expensesAll._sum.amount)} />
       </section>
       <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-6 border border-gray-200 dark:border-gray-800">
         <h2 className="text-lg font-semibold mb-2">Hours by project</h2>
@@ -112,6 +138,17 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             <li key={h.projectId} className="border rounded-md p-3 flex items-center justify-between">
               <span>{projectMap.get(h.projectId) ?? h.projectId}</span>
               <span className="font-medium">{toHours(h._sum.durationMinutes)}h</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-6 border border-gray-200 dark:border-gray-800">
+        <h2 className="text-lg font-semibold mb-2">Expenses by project</h2>
+        <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+          {expensesByProject.map(e => (
+            <li key={e.projectId} className="border rounded-md p-3 flex items-center justify-between">
+              <span>{projectMap.get(e.projectId) ?? e.projectId}</span>
+              <span className="font-medium">{formatCurrency(e._sum.amount)}</span>
             </li>
           ))}
         </ul>
