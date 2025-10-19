@@ -201,9 +201,9 @@ export async function canEditJournalEntry(userId: string, entryId: string): Prom
   // Can edit if it's their own entry
   if (entry.userId === userId) return true;
 
-  // Can edit if they're project owner
+  // Can edit if they're project owner or editor
   const permissions = await checkProjectPermissions(userId, entry.projectId);
-  return permissions.role === 'OWNER';
+  return permissions.role === 'OWNER' || permissions.role === 'EDITOR';
 }
 
 /**
@@ -220,7 +220,7 @@ export async function canEditTimeEntry(userId: string, entryId: string): Promise
   // Can edit if it's their own entry
   if (entry.userId === userId) return true;
 
-  // Can edit if they're project owner
+  // Can edit if they're project owner or editor
   const permissions = await checkProjectPermissions(userId, entry.projectId);
-  return permissions.role === 'OWNER';
+  return permissions.role === 'OWNER' || permissions.role === 'EDITOR';
 }

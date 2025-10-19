@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { canEditTimeEntry } from "@/lib/project-permissions";
 
 const manualSchema = z.object({
   projectId: z.string().min(1),
@@ -61,6 +62,10 @@ export async function updateTimeEntry(formData: FormData): Promise<void> {
   const id = String(formData.get("id"));
   if (!id) return;
   
+  // Check if user has permission to edit this time entry
+  const hasPermission = await canEditTimeEntry(userId, id);
+  if (!hasPermission) return;
+  
   const parsed = manualSchema.safeParse({
     projectId: formData.get("projectId"),
     personId: formData.get("personId"),
@@ -79,7 +84,7 @@ export async function updateTimeEntry(formData: FormData): Promise<void> {
   const durationMinutes = Math.max(0, Math.round((endAt.getTime() - startAt.getTime()) / 60000) - breakMinutes);
 
   await db.timeEntry.update({
-    where: { id, userId } as any,
+    where: { id },
     data: {
       projectId,
       personId: personId || null,
@@ -101,7 +106,11 @@ export async function deleteTimeEntry(formData: FormData): Promise<void> {
   const id = String(formData.get("id"));
   if (!id || !userId) return;
   
-  await db.timeEntry.delete({ where: { id, userId } as any });
+  // Check if user has permission to delete this time entry
+  const hasPermission = await canEditTimeEntry(userId, id);
+  if (!hasPermission) return;
+  
+  await db.timeEntry.delete({ where: { id } });
   revalidatePath("/time");
 }
 

@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { canEditJournalEntry } from "@/lib/project-permissions";
 
 const schema = z.object({
   projectId: z.string().min(1),
@@ -65,6 +66,10 @@ export async function updateJournalEntry(formData: FormData): Promise<void> {
   const id = String(formData.get("id"));
   if (!id) return;
   
+  // Check if user has permission to edit this journal entry
+  const hasPermission = await canEditJournalEntry(userId, id);
+  if (!hasPermission) return;
+  
   const parsed = schema.safeParse({
     projectId: formData.get("projectId"),
     date: formData.get("date"),
@@ -91,7 +96,7 @@ export async function updateJournalEntry(formData: FormData): Promise<void> {
 
   // Update the journal entry
   await db.journalEntry.update({
-    where: { id, userId } as any,
+    where: { id },
     data: {
       projectId,
       date: new Date(date),
@@ -115,13 +120,17 @@ export async function deleteJournalEntry(formData: FormData): Promise<void> {
   const id = String(formData.get("id"));
   if (!id || !userId) return;
   
+  // Check if user has permission to delete this journal entry
+  const hasPermission = await canEditJournalEntry(userId, id);
+  if (!hasPermission) return;
+  
   // Delete associated photos first
   await db.photo.deleteMany({
     where: { journalEntryId: id }
   });
   
   // Delete the journal entry
-  await db.journalEntry.delete({ where: { id, userId } as any });
+  await db.journalEntry.delete({ where: { id } });
   revalidatePath("/journal");
 }
 
