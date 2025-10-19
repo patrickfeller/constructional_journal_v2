@@ -92,13 +92,13 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
 
   return (
     <form action={handleSubmit} className="grid gap-3">
-      <div className="grid sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <select 
           name="projectId" 
           aria-label="Project" 
           value={selectedProjectId}
           onChange={(e) => setSelectedProjectId(e.target.value)}
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full" 
           required
           disabled={isPending}
         >
@@ -113,14 +113,14 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
           aria-label="Date" 
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full" 
           required 
           disabled={isPending}
         />
         <input 
           name="title" 
           placeholder="Title" 
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full" 
           required 
           disabled={isPending}
         />
@@ -129,7 +129,7 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
         name="notes" 
         aria-label="Notes" 
         placeholder="Notes (Markdown supported)" 
-        className="border rounded-md px-3 py-2 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+        className="border rounded-md px-3 py-2 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full" 
         disabled={isPending}
       />
       
@@ -161,7 +161,7 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
           accept="image/*" 
           multiple 
           onChange={(e) => e.target.files && handlePhotoUpload(e.target.files)}
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full" 
           disabled={isPending || uploading}
         />
         {uploading && <div className="text-sm text-gray-600">Uploading photos...</div>}

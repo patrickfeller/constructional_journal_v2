@@ -194,7 +194,7 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
             name="title"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full"
             placeholder="Entry title"
             required
             aria-label="Entry title"
@@ -203,7 +203,7 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
             name="projectId"
             value={formData.projectId}
             onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full"
             required
             aria-label="Project"
           >
@@ -214,13 +214,13 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
             ))}
           </select>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           <input
             type="date"
             name="date"
             value={formData.date}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full"
             required
             aria-label="Date"
           />
@@ -229,7 +229,7 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
             placeholder="Notes (optional)"
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 resize-none"
+            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 resize-none w-full"
             rows={3}
             aria-label="Notes"
           />
@@ -310,18 +310,18 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
           )}
           
           {/* Add New Photos */}
-          <div>
+          <div className="min-w-0">
             <input
               ref={fileInputRef}
               type="file"
               multiple
               accept="image/*"
               onChange={handleFileSelect}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900 dark:file:text-indigo-300"
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900 dark:file:text-indigo-300 overflow-hidden"
               aria-label="Add new photos"
               title="Select photos to add"
             />
-            <p className="text-xs text-gray-500 mt-1">Select one or more images to add</p>
+            <p className="text-xs text-gray-500 mt-1 break-words">Select one or more images to add</p>
           </div>
         </div>
 
