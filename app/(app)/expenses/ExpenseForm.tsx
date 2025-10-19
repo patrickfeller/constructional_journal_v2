@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition, useState, useRef } from "react";
+import { upload } from '@vercel/blob/client';
 import { createExpense } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
@@ -45,19 +46,13 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
     if (!file) return;
 
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
 
     try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
+      const { url } = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload',
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUploadedFile(data.url);
-      }
+      setUploadedFile(url);
     } catch (error) {
       console.error("Upload error:", error);
     } finally {

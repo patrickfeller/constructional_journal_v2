@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import { upload } from '@vercel/blob/client';
 import { updateExpense } from "./actions";
 import { Dialog, DialogHeader, DialogTitle, DialogBody } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -58,19 +59,13 @@ export function ExpenseEditForm({ expense, projects, companies }: ExpenseEditFor
     if (!file) return;
 
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
 
     try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
+      const { url } = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload',
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUploadedFile(data.url);
-      }
+      setUploadedFile(url);
     } catch (error) {
       console.error("Upload error:", error);
     } finally {
