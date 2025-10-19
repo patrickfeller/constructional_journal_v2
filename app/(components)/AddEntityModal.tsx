@@ -48,14 +48,14 @@ export function AddEntityModal({ isOpen, onClose }: AddEntityModalProps) {
     setLoading(true);
     try {
       const [projectsRes, peopleRes, companiesRes] = await Promise.all([
-        fetch("/api/projects").catch(() => ({ ok: false })),
-        fetch("/api/people").catch(() => ({ ok: false })),
-        fetch("/api/companies").catch(() => ({ ok: false })),
+        fetch("/api/projects").catch(() => null),
+        fetch("/api/people").catch(() => null),
+        fetch("/api/companies").catch(() => null),
       ]);
 
-      const projects = projectsRes.ok ? await projectsRes.json() : [];
-      const people = peopleRes.ok ? await peopleRes.json() : [];
-      const companies = companiesRes.ok ? await companiesRes.json() : [];
+      const projects = projectsRes?.ok ? await projectsRes.json() : [];
+      const people = peopleRes?.ok ? await peopleRes.json() : [];
+      const companies = companiesRes?.ok ? await companiesRes.json() : [];
 
       setData({ projects, people, companies });
     } catch (error) {
