@@ -13,7 +13,7 @@ export function DashboardFilters({
   projects: Item[];
   people: Item[];
   companies: Item[];
-  selected: { projectId?: string; personId?: string; companyId?: string };
+  selected: { projectId?: string; personId?: string; companyId?: string; timeline?: string };
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -30,54 +30,88 @@ export function DashboardFilters({
     router.replace(pathname);
   }
 
+  function exportCSV() {
+    const params = new URLSearchParams();
+    if (selected.projectId) params.set('projectId', selected.projectId);
+    if (selected.personId) params.set('personId', selected.personId);
+    if (selected.companyId) params.set('companyId', selected.companyId);
+    if (selected.timeline) params.set('timeline', selected.timeline);
+    
+    const url = `/api/export/time-entries?${params.toString()}`;
+    window.open(url, '_blank');
+  }
+
   return (
-    <div className="mb-4 grid gap-2 sm:grid-cols-4">
-      <select
-        aria-label="Filter by project"
-        className="border rounded-md px-3 py-2 bg-background text-foreground"
-        value={selected.projectId ?? ""}
-        onChange={(e) => updateParam("projectId", e.target.value)}
-      >
-        <option value="">All projects</option>
-        {projects.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.name}
-          </option>
-        ))}
-      </select>
-      <select
-        aria-label="Filter by person"
-        className="border rounded-md px-3 py-2 bg-background text-foreground"
-        value={selected.personId ?? ""}
-        onChange={(e) => updateParam("personId", e.target.value)}
-      >
-        <option value="">All people</option>
-        {people.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.name}
-          </option>
-        ))}
-      </select>
-      <select
-        aria-label="Filter by company"
-        className="border rounded-md px-3 py-2 bg-background text-foreground"
-        value={selected.companyId ?? ""}
-        onChange={(e) => updateParam("companyId", e.target.value)}
-      >
-        <option value="">All companies</option>
-        {companies.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
-      <button
-        type="button"
-        className="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2"
-        onClick={clearAll}
-      >
-        Clear
-      </button>
+    <div className="mb-4 space-y-4">
+      <div className="grid gap-2 sm:grid-cols-4">
+        <select
+          aria-label="Filter by project"
+          className="border rounded-md px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+          value={selected.projectId ?? ""}
+          onChange={(e) => updateParam("projectId", e.target.value)}
+        >
+          <option value="">All projects</option>
+          {projects.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="Filter by person"
+          className="border rounded-md px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+          value={selected.personId ?? ""}
+          onChange={(e) => updateParam("personId", e.target.value)}
+        >
+          <option value="">All people</option>
+          {people.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="Filter by company"
+          className="border rounded-md px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+          value={selected.companyId ?? ""}
+          onChange={(e) => updateParam("companyId", e.target.value)}
+        >
+          <option value="">All companies</option>
+          {companies.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          className="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2"
+          onClick={clearAll}
+        >
+          Clear
+        </button>
+      </div>
+      <div className="flex gap-2 items-center">
+        <select
+          aria-label="Select timeline"
+          className="border rounded-md px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+          value={selected.timeline ?? "30"}
+          onChange={(e) => updateParam("timeline", e.target.value)}
+        >
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="365">Last 1 year</option>
+          <option value="all">All time</option>
+        </select>
+        <button
+          type="button"
+          className="rounded-md bg-green-600 hover:bg-green-700 text-white px-4 py-2"
+          onClick={exportCSV}
+        >
+          Export CSV
+        </button>
+      </div>
     </div>
   );
 }

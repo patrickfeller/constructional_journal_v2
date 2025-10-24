@@ -1,3 +1,4 @@
+
 import { db } from "@/lib/db";
 import { DashboardTimeChart, type TimePoint } from "@/components/DashboardTimeChart";
 import { DashboardFilters } from "@/components/DashboardFilters";
@@ -8,13 +9,27 @@ import { getUserAccessibleProjects } from "@/lib/project-permissions";
 function startOfDay(d: Date) { d.setHours(0,0,0,0); return d; }
 function addDays(d: Date, days: number) { const x = new Date(d); x.setDate(x.getDate()+days); return x; }
 
-export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ projectId?: string; personId?: string; companyId?: string }> }) {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ projectId?: string; personId?: string; companyId?: string; timeline?: string }> }) {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
   const resolved = await searchParams;
   const now = new Date();
   const weekStart = startOfDay(addDays(new Date(now), -now.getDay()));
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  // Calculate timeline date range
+  const timeline = resolved?.timeline ?? "30";
+  let chartStartDate: Date | undefined;
+  let chartDays = 30;
+  
+  if (timeline === "all") {
+    chartStartDate = undefined;
+    chartDays = 365; // Default to 1 year for display purposes
+  } else {
+    const days = parseInt(timeline);
+    chartStartDate = addDays(new Date(now), -days);
+    chartDays = days;
+  }
 
   // Get all projects user has access to (owned + shared)
   const accessibleProjects = await getUserAccessibleProjects(userId);
@@ -95,10 +110,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   ]);
   const projectMap = new Map(projects.map(p => [p.id, p.name] as const));
 
-  // Build daily time series for the last 30 days
-  const since = addDays(new Date(now), -29);
+  // Build daily time series based on timeline selection
   const entries = await db.timeEntry.findMany({
-    where: { ...whereBase, date: { gte: startOfDay(new Date(since)) } },
+    where: { 
+      ...whereBase, 
+      ...(chartStartDate ? { date: { gte: startOfDay(new Date(chartStartDate)) } } : {})
+    },
     select: { date: true, durationMinutes: true },
     orderBy: { date: "asc" },
   });
@@ -107,8 +124,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     const key = startOfDay(new Date(e.date)).toISOString().slice(0,10);
     byDay.set(key, (byDay.get(key) ?? 0) + (e.durationMinutes ?? 0));
   });
-  const series: TimePoint[] = Array.from({ length: 30 }).map((_, i) => {
-    const d = addDays(new Date(since), i);
+  
+  // Generate series data based on timeline
+  const series: TimePoint[] = Array.from({ length: chartDays }).map((_, i) => {
+    const startDate = chartStartDate || addDays(new Date(now), -chartDays);
+    const d = addDays(new Date(startDate), i);
     const key = d.toISOString().slice(0,10);
     return { date: key.slice(5), hours: Math.round(((byDay.get(key) ?? 0) / 60) * 10) / 10 };
   });
@@ -154,12 +174,14 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </ul>
       </section>
       <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-6 border border-gray-200 dark:border-gray-800">
-        <h2 className="text-lg font-semibold mb-2">Time spent (last 30 days)</h2>
+        <h2 className="text-lg font-semibold mb-2">
+          Time spent {timeline === "all" ? "(all time)" : `(last ${timeline} days)`}
+        </h2>
         <DashboardFilters
           projects={projects.map(p => ({ id: p.id, name: p.name }))}
           people={people.map(p => ({ id: p.id, name: p.name }))}
           companies={companies.map(c => ({ id: c.id, name: c.name }))}
-          selected={{ projectId: resolved?.projectId, personId: resolved?.personId, companyId: resolved?.companyId }}
+          selected={{ projectId: resolved?.projectId, personId: resolved?.personId, companyId: resolved?.companyId, timeline: resolved?.timeline }}
         />
         <DashboardTimeChart data={series} />
       </section>
