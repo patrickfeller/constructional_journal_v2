@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { addProjectCompany, updateProjectCompany, removeProjectCompany } from "./actions";
 
 interface ProjectCompany {
@@ -122,17 +123,25 @@ export function ProjectCompanyList({
       {companies.map((company) => (
         <div key={company.id} className="border rounded-lg p-3">
           <div className="flex items-center justify-between mb-2">
-            <div>
-              <div className="font-medium">{company.name}</div>
-              <div className="text-sm text-muted-foreground">
-                {company.hourlyRateDefault 
-                  ? `Default rate: $${company.hourlyRateDefault}/hr`
-                  : "No default rate"
-                }
+            <Link 
+              href={`/projects/${projectId}/companies/${company.id}`}
+              className="flex-1 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded p-1 -m-1 transition-colors"
+              onClick={() => console.log('Navigating to company:', company.id)}
+            >
+              <div>
+                <div className="font-medium text-blue-600 hover:text-blue-800 hover:underline">
+                  {company.name}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {company.hourlyRateDefault 
+                    ? `Default rate: $${company.hourlyRateDefault}/hr`
+                    : "No default rate"
+                  }
+                </div>
               </div>
-            </div>
+            </Link>
             {canEdit && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 ml-2">
                 <button 
                   onClick={() => setEditingCompany(company)}
                   className="text-sm text-blue-600 hover:underline"
