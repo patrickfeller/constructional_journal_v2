@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback, useTransition } from "react";
-import { upload } from '@vercel/blob/client';
+import { upload } from "@vercel/blob/client";
 import { WeatherData } from "@/lib/weather";
 import { Button } from "@/components/ui/button";
 import { createJournalEntry } from "./actions";
+import { compressImages } from "@/lib/client/imageCompression";
 
 interface JournalFormProps {
   projects: any[];
@@ -28,16 +29,19 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
     const urls: string[] = [];
     
     try {
-      for (const file of files) {
+      const filesToProcess = Array.from(files);
+      const compressedFiles = await compressImages(filesToProcess);
+
+      for (const file of compressedFiles) {
         const { url } = await upload(file.name, file, {
-          access: 'public',
-          handleUploadUrl: '/api/upload',
+          access: "public",
+          handleUploadUrl: "/api/upload",
         });
         urls.push(url);
       }
       setUploadedUrls(prev => [...prev, ...urls]);
     } catch (error) {
-      console.error('Upload failed:', error);
+      console.error("Upload failed:", error);
     } finally {
       setUploading(false);
     }

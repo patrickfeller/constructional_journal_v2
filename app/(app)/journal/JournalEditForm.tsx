@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { updateJournalEntry } from "./actions";
 import { WeatherData } from "@/lib/weather";
-import { upload } from '@vercel/blob/client';
+import { upload } from "@vercel/blob/client";
+import { compressImages } from "@/lib/client/imageCompression";
 
 interface Project {
   id: string;
@@ -136,10 +137,12 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
     try {
       // Upload new photos first to get their URLs
       const newPhotoUrls: string[] = [];
-      for (const file of newPhotos) {
+      const compressedNewPhotos = await compressImages(newPhotos);
+
+      for (const file of compressedNewPhotos) {
         const { url } = await upload(file.name, file, {
-          access: 'public',
-          handleUploadUrl: '/api/upload',
+          access: "public",
+          handleUploadUrl: "/api/upload",
         });
         newPhotoUrls.push(url);
       }
