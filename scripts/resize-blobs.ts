@@ -75,11 +75,15 @@ const supportedContentTypes: SupportedImageType[] = [
 async function* iterateBlobs(prefix?: string) {
   let cursor: string | undefined;
   do {
-    const result = await list({
+    const listOptions: any = {
       limit: 1000,
       cursor,
-      prefix,
-    });
+    };
+    if (prefix) {
+      listOptions.prefix = prefix;
+    }
+    
+    const result = await list(listOptions);
 
     for (const blob of result.blobs) {
       yield blob;
@@ -91,15 +95,25 @@ async function* iterateBlobs(prefix?: string) {
 
 async function processBlob(pathname: string, dryRun: boolean) {
   const metadata = await head(pathname);
-  if (!supportedContentTypes.includes(metadata.contentType as SupportedImageType)) {
-    console.log(`Skipping non-optimized type: ${pathname} (${metadata.contentType})`);
+  
+  // Infer content type from file extension if undefined
+  let contentType = metadata.contentType;
+  if (!contentType) {
+    const ext = pathname.toLowerCase().split('.').pop();
+    if (ext === 'jpg' || ext === 'jpeg') contentType = 'image/jpeg';
+    else if (ext === 'png') contentType = 'image/png';
+    else if (ext === 'webp') contentType = 'image/webp';
+  }
+  
+  if (!contentType || !supportedContentTypes.includes(contentType as SupportedImageType)) {
+    console.log(`Skipping non-optimized type: ${pathname} (${contentType || 'unknown'})`);
     return { skipped: 1, updatedBytes: 0 };
   }
 
-  const { downloadUrl, size: originalSize } = metadata;
+  const { url, size: originalSize } = metadata;
 
-  if (!downloadUrl) {
-    console.warn(`No download URL for ${pathname}, skipping.`);
+  if (!url) {
+    console.warn(`No URL for ${pathname}, skipping.`);
     return { skipped: 1, updatedBytes: 0 };
   }
 
@@ -108,7 +122,12 @@ async function processBlob(pathname: string, dryRun: boolean) {
     return { skipped: 1, updatedBytes: 0 };
   }
 
-  const response = await fetch(downloadUrl);
+  // Use the blob URL directly with authorization header
+  const response = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+    },
+  });
   if (!response.ok) {
     console.error(`Failed to download ${pathname}: ${response.status} ${response.statusText}`);
     return { skipped: 1, updatedBytes: 0 };
@@ -124,16 +143,16 @@ async function processBlob(pathname: string, dryRun: boolean) {
     withoutEnlargement: true,
   });
 
-  let outputContentType: SupportedImageType = metadata.contentType as SupportedImageType;
+  // OPTION A: Keep original format for database consistency
+  let outputContentType: SupportedImageType = contentType as SupportedImageType;
 
-  if (metadata.contentType === "image/png") {
-    pipeline = pipeline.webp({ quality });
-    outputContentType = "image/webp";
-  } else if (metadata.contentType === "image/webp") {
+  if (contentType === "image/png") {
+    pipeline = pipeline.png({ quality, compressionLevel: 9 });
+  } else if (contentType === "image/webp") {
     pipeline = pipeline.webp({ quality });
   } else {
+    // jpeg
     pipeline = pipeline.jpeg({ quality, mozjpeg: true });
-    outputContentType = "image/jpeg";
   }
 
   const optimizedBuffer = await pipeline.toBuffer();
@@ -178,6 +197,10 @@ async function main() {
       const result = await processBlob(blob.pathname, options.dryRun);
       summary.skipped += result.skipped;
       summary.savedBytes += result.updatedBytes;
+      
+      // Add delay to avoid triggering Vercel WAF rate limiting
+      // Wait 200ms between blob operations
+      await new Promise(resolve => setTimeout(resolve, 200));
     } catch (error) {
       console.error(`Failed to process ${blob.pathname}:`, error);
     }
