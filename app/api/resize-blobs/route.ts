@@ -59,8 +59,12 @@ async function processBlob(pathname: string): Promise<ProcessResult> {
       };
     }
 
-    // Server-side fetch (no CORS/firewall issues)
-    const response = await fetch(url);
+    // Server-side fetch with authorization
+    const response = await fetch(url, {
+      headers: process.env.BLOB_READ_WRITE_TOKEN ? {
+        'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+      } : {},
+    });
     
     if (!response.ok) {
       return {
