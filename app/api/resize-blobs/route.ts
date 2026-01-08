@@ -1,4 +1,4 @@
-import { list, head, put } from "@vercel/blob";
+import { list, head, put, copy } from "@vercel/blob";
 import sharp from "sharp";
 import { NextResponse } from "next/server";
 
@@ -48,7 +48,7 @@ async function processBlob(pathname: string): Promise<ProcessResult> {
       };
     }
 
-    const { url, size: originalSize } = metadata;
+    const { url, size: originalSize, downloadUrl } = metadata;
 
     if (originalSize <= targetBytes) {
       return {
@@ -59,23 +59,64 @@ async function processBlob(pathname: string): Promise<ProcessResult> {
       };
     }
 
-    // Server-side fetch with authorization
-    const response = await fetch(url, {
-      headers: process.env.BLOB_READ_WRITE_TOKEN ? {
-        'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
-      } : {},
-    });
+    // Try multiple download methods
+    let arrayBuffer: ArrayBuffer | null = null;
+    let lastError = '';
     
-    if (!response.ok) {
+    // Method 1: Try downloadUrl with query parameter
+    if (downloadUrl) {
+      try {
+        const response = await fetch(downloadUrl);
+        if (response.ok) {
+          arrayBuffer = await response.arrayBuffer();
+        } else {
+          lastError = `downloadUrl failed: ${response.status}`;
+        }
+      } catch (e) {
+        lastError = `downloadUrl error: ${e instanceof Error ? e.message : 'unknown'}`;
+      }
+    }
+    
+    // Method 2: Try regular URL without auth
+    if (!arrayBuffer) {
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          arrayBuffer = await response.arrayBuffer();
+        } else {
+          lastError += ` | url failed: ${response.status}`;
+        }
+      } catch (e) {
+        lastError += ` | url error: ${e instanceof Error ? e.message : 'unknown'}`;
+      }
+    }
+    
+    // Method 3: Try with auth header
+    if (!arrayBuffer && process.env.BLOB_READ_WRITE_TOKEN) {
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+          },
+        });
+        if (response.ok) {
+          arrayBuffer = await response.arrayBuffer();
+        } else {
+          lastError += ` | auth failed: ${response.status}`;
+        }
+      } catch (e) {
+        lastError += ` | auth error: ${e instanceof Error ? e.message : 'unknown'}`;
+      }
+    }
+
+    if (!arrayBuffer) {
       return {
         pathname,
         status: 'error',
         originalSize,
-        reason: `Download failed: ${response.status}`,
+        reason: `All download methods failed: ${lastError}`,
       };
     }
-
-    const arrayBuffer = await response.arrayBuffer();
     let pipeline = sharp(Buffer.from(arrayBuffer), { failOnError: false }).rotate();
 
     pipeline = pipeline.resize({
