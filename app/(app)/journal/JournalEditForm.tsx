@@ -49,7 +49,7 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleEdit = () => {
+  const handleEdit = async () => {
     setIsEditing(true);
     setFormData({
       title: entry.title,
@@ -57,7 +57,20 @@ export function JournalEditForm({ entry, projects }: JournalEditFormProps) {
       date: new Date(entry.date).toISOString().slice(0, 10),
       projectId: entry.projectId
     });
-    setPhotos(entry.photos);
+    
+    // Filter out deleted/unavailable photos
+    const validPhotos = await Promise.all(
+      entry.photos.map(async (photo) => {
+        try {
+          const response = await fetch(photo.url, { method: 'HEAD' });
+          return response.ok ? photo : null;
+        } catch {
+          return null;
+        }
+      })
+    );
+    
+    setPhotos(validPhotos.filter((p): p is Photo => p !== null));
     setNewPhotos([]);
   };
 
