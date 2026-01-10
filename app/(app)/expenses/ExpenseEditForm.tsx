@@ -6,6 +6,7 @@ import { updateExpense } from "./actions";
 import { Dialog, DialogHeader, DialogTitle, DialogBody } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Pencil, Upload } from "lucide-react";
+import { compressImage } from "@/lib/client/imageCompression";
 
 interface Project {
   id: string;
@@ -61,7 +62,12 @@ export function ExpenseEditForm({ expense, projects, companies }: ExpenseEditFor
     setIsUploading(true);
 
     try {
-      const { url } = await upload(file.name, file, {
+      // Compress image files before upload
+      const fileToUpload = file.type.startsWith('image/') 
+        ? await compressImage(file)
+        : file;
+      
+      const { url } = await upload(fileToUpload.name, fileToUpload, {
         access: 'public',
         handleUploadUrl: '/api/upload',
       });

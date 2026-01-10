@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { ExpenseForm } from "./ExpenseForm";
 import { ExpenseEditForm } from "./ExpenseEditForm";
 import { DeleteExpenseButton } from "./DeleteExpenseButton";
+import { InvoiceLink } from "./InvoiceLink";
 import { getUserAccessibleProjects } from "@/lib/project-permissions";
 
 export default async function ExpensesPage() {
@@ -107,16 +108,7 @@ export default async function ExpensesPage() {
                   </div>
                   <div className="text-sm mt-1">{expense.description}</div>
                   {expense.invoiceUrl && (
-                    <div className="mt-2">
-                      <a
-                        href={expense.invoiceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
-                      >
-                        View Invoice
-                      </a>
-                    </div>
+                    <InvoiceLink invoiceUrl={expense.invoiceUrl} />
                   )}
                 </div>
                 <div className="flex gap-2 flex-shrink-0">

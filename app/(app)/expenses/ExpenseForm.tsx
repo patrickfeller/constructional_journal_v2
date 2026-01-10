@@ -5,6 +5,7 @@ import { upload } from '@vercel/blob/client';
 import { createExpense } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
+import { compressImage } from "@/lib/client/imageCompression";
 
 interface Project {
   id: string;
@@ -48,7 +49,12 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
     setIsUploading(true);
 
     try {
-      const { url } = await upload(file.name, file, {
+      // Compress image files before upload
+      const fileToUpload = file.type.startsWith('image/') 
+        ? await compressImage(file)
+        : file;
+      
+      const { url } = await upload(fileToUpload.name, fileToUpload, {
         access: 'public',
         handleUploadUrl: '/api/upload',
       });
