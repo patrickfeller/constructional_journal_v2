@@ -102,7 +102,7 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
           aria-label="Project" 
           value={selectedProjectId}
           onChange={(e) => setSelectedProjectId(e.target.value)}
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full" 
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400 w-full"
           required
           disabled={isPending}
         >
@@ -114,17 +114,17 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
         <input 
           type="date" 
           name="date" 
-          aria-label="Date" 
+          aria-label="Date"
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full" 
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400 w-full" 
           required 
           disabled={isPending}
         />
         <input 
           name="title" 
-          placeholder="Title" 
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full" 
+          placeholder="Title"
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400 w-full" 
           required 
           disabled={isPending}
         />
@@ -132,22 +132,22 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
       <textarea 
         name="notes" 
         aria-label="Notes" 
-        placeholder="Notes (Markdown supported)" 
-        className="border rounded-md px-3 py-2 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full" 
+        placeholder="Notes (Markdown supported)"
+        className="border border-[var(--line)] rounded-md px-3 py-2 min-h-[100px] bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400 w-full" 
         disabled={isPending}
       />
       
       {/* Weather Information */}
       {weatherLoading && (
-        <div className="text-sm text-gray-600">Loading weather data...</div>
+        <div className="text-sm text-[var(--ink-2)]">Loading weather data...</div>
       )}
       {weatherData && (
-        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+        <div className="p-3 bg-[var(--surface-2)] border border-[var(--line)] rounded-md">
           <div className="flex items-center gap-2 text-sm">
             <span className="text-2xl">{weatherData.icon}</span>
             <div>
               <div className="font-medium">{weatherData.description}</div>
-              <div className="text-gray-600 dark:text-gray-400">
+              <div className="text-[var(--ink-2)]">
                 {weatherData.temperature}°C on {new Date(weatherData.date).toLocaleDateString()}
               </div>
             </div>
@@ -165,10 +165,10 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
           accept="image/*" 
           multiple 
           onChange={(e) => e.target.files && handlePhotoUpload(e.target.files)}
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800 w-full" 
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400 w-full"
           disabled={isPending || uploading}
         />
-        {uploading && <div className="text-sm text-gray-600">Uploading photos...</div>}
+        {uploading && <div className="text-sm text-[var(--ink-2)]">Uploading photos...</div>}
         {uploadedUrls.length > 0 && (
           <div className="text-sm text-green-600">
             {uploadedUrls.length} photo(s) uploaded successfully
@@ -186,7 +186,7 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
         loading={isPending}
         loadingText="Adding entry..."
         disabled={isPending || uploading}
-        className="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 w-fit"
+        className="w-fit"
       >
         Add Entry
       </Button>

@@ -101,7 +101,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             name="projectId"
             value={formData.projectId}
             onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
             required
             aria-label="Project"
             disabled={isPending}
@@ -116,7 +116,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             name="personId"
             value={formData.personId}
             onChange={(e) => setFormData({ ...formData, personId: e.target.value })}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
             aria-label="Person"
             disabled={isPending}
           >
@@ -134,7 +134,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             name="date"
             value={formData.date}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
             required
             aria-label="Date"
             disabled={isPending}
@@ -144,7 +144,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             name="start"
             value={formData.start}
             onChange={(e) => setFormData({ ...formData, start: e.target.value })}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
             required
             aria-label="Start time"
             disabled={isPending}
@@ -154,7 +154,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             name="end"
             value={formData.end}
             onChange={(e) => setFormData({ ...formData, end: e.target.value })}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
             required
             aria-label="End time"
             disabled={isPending}
@@ -167,7 +167,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             value={formData.breakMinutes}
             onChange={(e) => setFormData({ ...formData, breakMinutes: parseInt(e.target.value) || 0 })}
             min={0}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
             placeholder="Break (mins)"
             aria-label="Break minutes"
             disabled={isPending}
@@ -177,7 +177,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
             placeholder="Notes (optional)"
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
             aria-label="Notes"
             disabled={isPending}
           />
@@ -199,7 +199,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
             size="sm"
             onClick={handleCancel}
             disabled={isPending}
-            className="text-gray-600 hover:text-gray-700"
+            className="text-[var(--ink-2)] hover:text-[var(--ink-2)]"
           >
             Cancel
           </Button>
@@ -213,7 +213,7 @@ export function TimeEditForm({ entry, projects, people }: TimeEditFormProps) {
       variant="ghost"
       size="sm"
       onClick={handleEdit}
-      className="text-blue-600 hover:text-blue-700"
+      className="text-[var(--accent-deep)] hover:text-[var(--accent-deep)]"
     >
       Change
     </Button>

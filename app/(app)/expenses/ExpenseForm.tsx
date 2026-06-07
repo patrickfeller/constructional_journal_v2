@@ -89,7 +89,7 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
           <select
             name="projectId"
             aria-label="Project"
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
             required
             disabled={isPending}
           >
@@ -110,7 +110,7 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
             step="0.01"
             min="0"
             placeholder="0.00"
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
             required
             disabled={isPending}
           />
@@ -123,7 +123,7 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
           name="description"
           rows={3}
           placeholder="What was this expense for?"
-          className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+          className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
           required
           disabled={isPending}
         />
@@ -142,18 +142,18 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
           onFocus={() => setShowSuggestions(true)}
           placeholder="Select or type company name"
           aria-label="Company name"
-          className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+          className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
           required
           disabled={isPending}
         />
         {showSuggestions && companyInput && filteredCompanies.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-md shadow-lg max-h-48 overflow-auto">
+          <div className="absolute z-10 w-full mt-1 bg-[var(--surface)] border border-[var(--line)] rounded-md shadow-lg max-h-48 overflow-auto">
             {filteredCompanies.map((company) => (
               <button
                 key={company.id}
                 type="button"
                 onClick={() => handleCompanySelect(company)}
-                className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="w-full text-left px-3 py-2 hover:bg-[var(--surface-2)] transition-colors"
               >
                 {company.name}
               </button>
@@ -170,7 +170,7 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
             name="date"
             defaultValue={today}
             aria-label="Expense date"
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
             required
             disabled={isPending}
           />
@@ -191,7 +191,7 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
             />
             <label
               htmlFor="invoice-upload"
-              className={`flex-1 border rounded-md px-3 py-2 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center justify-center gap-2 ${
+              className={`flex-1 border border-[var(--line)] rounded-md px-3 py-2 text-center cursor-pointer hover:bg-[var(--surface-2)] transition-colors flex items-center justify-center gap-2 ${
                 isUploading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -211,7 +211,7 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
         type="submit"
         loading={isPending}
         loadingText="Saving..."
-        className="w-full rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2"
+        className="w-full"
       >
         Add Expense
       </Button>
