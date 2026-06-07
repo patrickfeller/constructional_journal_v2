@@ -45,20 +45,10 @@ export default async function SettingsPage() {
     }).format(date);
   };
 
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case 'OWNER': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      case 'EDITOR': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
-      case 'VIEWER': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
-    }
-  };
-
   return (
     <>
     <AppBar title="Settings" />
     <main className="p-6 max-w-5xl mx-auto space-y-6">
-      <h1 className="text-2xl font-semibold mb-6">Settings</h1>
       
       {/* User Profile Overview */}
       <Card>
@@ -93,7 +83,16 @@ export default async function SettingsPage() {
               <label className="text-sm font-medium text-muted-foreground">Role</label>
               <div className="flex items-center gap-2">
                 <Shield className="h-4 w-4 text-muted-foreground" />
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeColor(userDetails.role)}`}>
+                <span
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  style={
+                    userDetails.role === 'OWNER'
+                      ? { background: 'color-mix(in oklab, var(--ok) 14%, transparent)', color: 'var(--ok)' }
+                      : userDetails.role === 'EDITOR'
+                      ? { background: 'color-mix(in oklab, var(--accent) 14%, transparent)', color: 'var(--accent-deep)' }
+                      : { background: 'var(--surface-2)', color: 'var(--ink-2)' }
+                  }
+                >
                   {userDetails.role}
                 </span>
               </div>
@@ -130,37 +129,37 @@ export default async function SettingsPage() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <FolderOpen className="h-6 w-6 mx-auto mb-2 text-blue-500" />
+              <FolderOpen className="h-6 w-6 mx-auto mb-2 text-[var(--accent)]" />
               <div className="text-2xl font-bold">{projectsCount}</div>
               <div className="text-xs text-muted-foreground">Projects</div>
             </div>
             
             <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <FileText className="h-6 w-6 mx-auto mb-2 text-green-500" />
+              <FileText className="h-6 w-6 mx-auto mb-2 text-[var(--accent)]" />
               <div className="text-2xl font-bold">{journalEntriesCount}</div>
               <div className="text-xs text-muted-foreground">Journal Entries</div>
             </div>
             
             <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <Timer className="h-6 w-6 mx-auto mb-2 text-orange-500" />
+              <Timer className="h-6 w-6 mx-auto mb-2 text-[var(--accent)]" />
               <div className="text-2xl font-bold">{timeEntriesCount}</div>
               <div className="text-xs text-muted-foreground">Time Entries</div>
             </div>
             
             <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <Users className="h-6 w-6 mx-auto mb-2 text-purple-500" />
+              <Users className="h-6 w-6 mx-auto mb-2 text-[var(--accent)]" />
               <div className="text-2xl font-bold">{peopleCount}</div>
               <div className="text-xs text-muted-foreground">People</div>
             </div>
             
             <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <Building2 className="h-6 w-6 mx-auto mb-2 text-red-500" />
+              <Building2 className="h-6 w-6 mx-auto mb-2 text-[var(--accent)]" />
               <div className="text-2xl font-bold">{companiesCount}</div>
               <div className="text-xs text-muted-foreground">Companies</div>
             </div>
             
             <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <Calendar className="h-6 w-6 mx-auto mb-2 text-indigo-500" />
+              <Calendar className="h-6 w-6 mx-auto mb-2 text-[var(--accent)]" />
               <div className="text-2xl font-bold">
                 {Math.floor((Date.now() - userDetails.createdAt.getTime()) / (1000 * 60 * 60 * 24))}
               </div>
@@ -185,12 +184,12 @@ export default async function SettingsPage() {
               <div className="text-sm">
                 {userDetails.passwordHash ? (
                   <span className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-[var(--ok)] rounded-full"></div>
                     Email & Password
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-[var(--alert)] rounded-full"></div>
                     OAuth Provider
                   </span>
                 )}
@@ -202,12 +201,12 @@ export default async function SettingsPage() {
               <div className="text-sm">
                 {userDetails.emailVerified ? (
                   <span className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-[var(--ok)] rounded-full"></div>
                     Verified on {formatDate(userDetails.emailVerified)}
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-[var(--alert)] rounded-full"></div>
                     Not verified
                   </span>
                 )}
