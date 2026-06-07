@@ -3,71 +3,102 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BookText, Plus, BarChart3, Settings } from "lucide-react";
+import { Home, BookText, Timer, BarChart3, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AddEntityModal } from "./AddEntityModal";
 
-const links = [
-  { href: "/", label: "Home", Icon: Home },
-  { href: "/journal", label: "Journal", Icon: BookText },
-  { href: "/dashboard", label: "Dash", Icon: BarChart3 },
-  { href: "/settings", label: "Settings", Icon: Settings },
+const tabs = [
+  { href: "/",          label: "Home",    Icon: Home      },
+  { href: "/journal",   label: "Journal", Icon: BookText  },
+  // FAB in centre
+  { href: "/time",      label: "Time",    Icon: Timer     },
+  { href: "/dashboard", label: "Dash",    Icon: BarChart3 },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+
+  const left  = tabs.slice(0, 2);
+  const right = tabs.slice(2);
 
   return (
     <>
-      <nav className="fixed z-40 bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-xl">
-        <div className="relative bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/60 shadow-lg rounded-2xl px-2 py-2 grid grid-cols-5 gap-1 border">
-          {/* Home */}
-          <NavItem {...links[0]} active={pathname === links[0].href} />
-          
-          {/* Journal */}
-          <NavItem {...links[1]} active={pathname === links[1].href} />
-          
-          {/* Add Button (Prominent Center) */}
-          <div className="flex items-center justify-center">
-            <button
-              onClick={() => setIsAddModalOpen(true)}
-              className="absolute -top-6 w-14 h-14 bg-gradient-to-br from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center focus:outline-none focus:ring-4 focus:ring-indigo-400/50 active:scale-95"
-              aria-label="Add new entry"
-            >
-              <Plus className="w-7 h-7" strokeWidth={2.5} />
-            </button>
-          </div>
-          
-          {/* Dashboard */}
-          <NavItem {...links[2]} active={pathname === links[2].href} />
-          
-          {/* Settings */}
-          <NavItem {...links[3]} active={pathname === links[3].href} />
+      <nav className="fixed z-40 bottom-4 inset-x-3">
+        <div
+          className="flex items-stretch gap-0.5 rounded-[24px] border border-[var(--line)] p-2"
+          style={{
+            background: "color-mix(in oklab, var(--surface) 86%, transparent)",
+            backdropFilter: "saturate(1.5) blur(18px)",
+            WebkitBackdropFilter: "saturate(1.5) blur(18px)",
+            boxShadow: "var(--shadow)",
+          }}
+        >
+          {left.map((t) => (
+            <NavTab key={t.href} {...t} active={pathname === t.href} />
+          ))}
+
+          {/* Centre FAB */}
+          <button
+            onClick={() => setAddOpen(true)}
+            aria-label="Add entry"
+            className={cn(
+              "flex-none flex items-center justify-center",
+              "w-[52px] h-[44px] rounded-[15px]",
+              "transition-transform duration-100 active:scale-90",
+              "bg-[var(--ink)] text-[var(--bg)] dark:bg-[var(--accent)] dark:text-[var(--on-accent)]"
+            )}
+            style={{ boxShadow: "var(--shadow)" }}
+          >
+            <Plus className="w-6 h-6" strokeWidth={2.5} />
+          </button>
+
+          {right.map((t) => (
+            <NavTab key={t.href} {...t} active={pathname === t.href} />
+          ))}
         </div>
       </nav>
 
-      <AddEntityModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+      <AddEntityModal isOpen={addOpen} onClose={() => setAddOpen(false)} />
     </>
   );
 }
 
-function NavItem({ href, label, Icon, active }: { href: string; label: string; Icon: any; active: boolean }) {
+function NavTab({
+  href,
+  label,
+  Icon,
+  active,
+}: {
+  href: string;
+  label: string;
+  Icon: React.ElementType;
+  active: boolean;
+}) {
   return (
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center py-1 text-xs rounded-md",
-        active
-          ? "text-primary"
-          : "text-muted-foreground hover:text-primary",
-        "focus:outline-none focus:ring-2 focus:ring-ring"
+        "flex-1 flex flex-col items-center justify-center gap-[3px]",
+        "py-[7px] rounded-[16px] min-h-[56px]",
+        "transition-colors duration-150",
+        active ? "text-[var(--ink)]" : "text-[var(--ink-3)]"
       )}
     >
-      <Icon className="w-5 h-5" />
-      <span className="mt-0.5">{label}</span>
+      <span
+        className={cn(
+          "w-10 h-7 rounded-[9px] flex items-center justify-center",
+          "transition-colors duration-150",
+          active
+            ? "bg-[var(--accent)] text-[var(--on-accent)]"
+            : "bg-transparent"
+        )}
+      >
+        <Icon className="w-[21px] h-[21px]" />
+      </span>
+      <span className="text-[10.5px] font-semibold tracking-[0.01em]">
+        {label}
+      </span>
     </Link>
   );
 }
-
-
