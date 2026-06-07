@@ -146,7 +146,7 @@ export function ProjectPersonList({
               <div className="flex gap-2">
                 <button 
                   onClick={() => setEditingPerson(person)}
-                  className="text-sm text-blue-600 hover:underline"
+                  className="text-sm text-[var(--accent-deep)] hover:underline"
                 >
                   Edit
                 </button>

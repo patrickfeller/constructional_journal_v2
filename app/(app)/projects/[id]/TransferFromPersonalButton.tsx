@@ -89,7 +89,8 @@ export function TransferFromPersonalButton({
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 transition-colors"
+        className="text-sm px-3 py-1 rounded-md transition-colors"
+        style={{ background: 'color-mix(in oklab, var(--accent) 14%, transparent)', color: 'var(--accent-deep)' }}
       >
         + From My Lists
       </button>

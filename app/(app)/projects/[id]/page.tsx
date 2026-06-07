@@ -121,11 +121,16 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             )}
           </div>
           <div className="flex items-center gap-2">
-            <span className={`text-xs px-2 py-1 rounded-full ${
-              permissions.role === 'OWNER' ? 'bg-green-100 text-green-800' :
-              permissions.role === 'EDITOR' ? 'bg-blue-100 text-blue-800' :
-              'bg-gray-100 text-gray-800'
-            }`}>
+            <span
+              className="text-xs px-2 py-1 rounded-full font-medium"
+              style={
+                permissions.role === 'OWNER'
+                  ? { background: 'color-mix(in oklab, var(--ok) 14%, transparent)', color: 'var(--ok)' }
+                  : permissions.role === 'EDITOR'
+                  ? { background: 'color-mix(in oklab, var(--accent) 14%, transparent)', color: 'var(--accent-deep)' }
+                  : { background: 'var(--surface-2)', color: 'var(--ink-2)' }
+              }
+            >
               {permissions.role}
             </span>
           </div>

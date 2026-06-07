@@ -148,11 +148,16 @@ export default async function CompanyDetailPage({ params }: CompanyDetailPagePro
             )}
           </div>
           <div className="flex items-center gap-2">
-            <span className={`text-xs px-2 py-1 rounded-full ${
-              permissions.role === 'OWNER' ? 'bg-green-100 text-green-800' :
-              permissions.role === 'EDITOR' ? 'bg-blue-100 text-blue-800' :
-              'bg-gray-100 text-gray-800'
-            }`}>
+            <span
+              className="text-xs px-2 py-1 rounded-full font-medium"
+              style={
+                permissions.role === 'OWNER'
+                  ? { background: 'color-mix(in oklab, var(--ok) 14%, transparent)', color: 'var(--ok)' }
+                  : permissions.role === 'EDITOR'
+                  ? { background: 'color-mix(in oklab, var(--accent) 14%, transparent)', color: 'var(--accent-deep)' }
+                  : { background: 'var(--surface-2)', color: 'var(--ink-2)' }
+              }
+            >
               {permissions.role}
             </span>
           </div>
@@ -170,7 +175,7 @@ export default async function CompanyDetailPage({ params }: CompanyDetailPagePro
             {timeEntries.length} {timeEntries.length === 1 ? 'entry' : 'entries'}
           </div>
           {companyWithNumbers.hourlyRateDefault && totalCost > 0 && (
-            <div className="text-sm text-green-600 dark:text-green-400 mt-1">
+            <div className="text-sm mt-1" style={{ color: 'var(--ok)' }}>
               Total cost: {formatCurrency(totalCost)}
             </div>
           )}
@@ -205,7 +210,7 @@ export default async function CompanyDetailPage({ params }: CompanyDetailPagePro
                     <div className="text-sm text-muted-foreground">
                       {new Date(entry.date).toLocaleDateString()}
                       {entry.owner && entry.owner.id !== userId && (
-                        <span className="ml-2 text-blue-600 dark:text-blue-400">
+                        <span className="ml-2 text-[var(--accent-deep)]">
                           by {entry.owner.name}
                         </span>
                       )}
@@ -244,7 +249,7 @@ export default async function CompanyDetailPage({ params }: CompanyDetailPagePro
                     <div className="text-sm text-muted-foreground">
                       {new Date(expense.date).toLocaleDateString()}
                       {expense.createdBy && expense.createdBy.id !== userId && (
-                        <span className="ml-2 text-blue-600 dark:text-blue-400">
+                        <span className="ml-2 text-[var(--accent-deep)]">
                           by {expense.createdBy.name}
                         </span>
                       )}

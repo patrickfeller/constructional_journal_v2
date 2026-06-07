@@ -125,11 +125,11 @@ export function ProjectCompanyList({
           <div className="flex items-center justify-between mb-2">
             <Link 
               href={`/projects/${projectId}/companies/${company.id}`}
-              className="flex-1 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded p-1 -m-1 transition-colors"
+              className="flex-1 cursor-pointer hover:bg-[var(--surface-2)] rounded p-1 -m-1 transition-colors"
               onClick={() => console.log('Navigating to company:', company.id)}
             >
               <div>
-                <div className="font-medium text-blue-600 hover:text-blue-800 hover:underline">
+                <div className="font-medium text-[var(--accent-deep)] hover:underline">
                   {company.name}
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -144,7 +144,7 @@ export function ProjectCompanyList({
               <div className="flex gap-2 ml-2">
                 <button 
                   onClick={() => setEditingCompany(company)}
-                  className="text-sm text-blue-600 hover:underline"
+                  className="text-sm text-[var(--accent-deep)] hover:underline"
                 >
                   Edit
                 </button>
