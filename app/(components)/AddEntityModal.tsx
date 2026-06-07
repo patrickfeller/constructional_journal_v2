@@ -18,12 +18,12 @@ interface AddEntityModalProps {
 type EntityType = "time" | "journal" | "person" | "company" | "project" | "expense" | null;
 
 const menuItems = [
-  { type: "time" as const, label: "Time", icon: Clock, color: "bg-blue-500" },
-  { type: "journal" as const, label: "Journal", icon: BookText, color: "bg-green-500" },
-  { type: "expense" as const, label: "Expense", icon: ReceiptEuro, color: "bg-yellow-500" },
-  { type: "person" as const, label: "Person", icon: User, color: "bg-purple-500" },
-  { type: "company" as const, label: "Company", icon: Building2, color: "bg-orange-500" },
-  { type: "project" as const, label: "Project", icon: FolderKanban, color: "bg-pink-500" },
+  { type: "time"    as const, label: "Time",    icon: Clock,        desc: "Clock hours"    },
+  { type: "journal" as const, label: "Journal", icon: BookText,     desc: "Log site notes" },
+  { type: "expense" as const, label: "Expense", icon: ReceiptEuro,  desc: "Add a cost"     },
+  { type: "person"  as const, label: "Person",  icon: User,         desc: "Add a worker"   },
+  { type: "company" as const, label: "Company", icon: Building2,    desc: "Add a company"  },
+  { type: "project" as const, label: "Project", icon: FolderKanban, desc: "New site"       },
 ];
 
 export function AddEntityModal({ isOpen, onClose }: AddEntityModalProps) {
@@ -85,37 +85,70 @@ export function AddEntityModal({ isOpen, onClose }: AddEntityModalProps) {
     }, 100);
   };
 
-  // Show floating menu when no type is selected
   if (!selectedType) {
     return (
       <>
         {isOpen && (
-          <div
-            className="fixed inset-0 z-50"
-            onClick={onClose}
-          >
+          <div className="fixed inset-0 z-50" onClick={onClose}>
             <div
-              className="absolute bottom-24 left-1/2 -translate-x-1/2 w-[90%] max-w-xs"
+              className="absolute bottom-24 left-3 right-3"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 p-3 space-y-2 animate-in zoom-in-95 slide-in-from-bottom-4 duration-200">
+              <div
+                className="rounded-[24px] border p-4"
+                style={{
+                  background: "var(--surface)",
+                  borderColor: "var(--line)",
+                  boxShadow: "var(--shadow)",
+                }}
+              >
+                {/* Grab handle */}
+                <div
+                  className="w-10 h-1.5 rounded-full mx-auto mb-3"
+                  style={{ background: "var(--line-2)" }}
+                />
+                <h3
+                  className="text-[18px] font-bold tracking-[-0.01em] mb-0.5 px-1"
+                  style={{ color: "var(--ink)" }}
+                >
+                  New entry
+                </h3>
+                <p className="text-[13px] mb-4 px-1" style={{ color: "var(--ink-2)" }}>
+                  What are you logging?
+                </p>
+
                 {loading ? (
-                  <div className="text-center py-4 text-sm text-muted-foreground">
-                    Loading...
+                  <div className="text-center py-6 text-sm" style={{ color: "var(--ink-3)" }}>
+                    Loading…
                   </div>
                 ) : (
-                  menuItems.map((item) => (
-                    <button
-                      key={item.type}
-                      onClick={() => handleSelectType(item.type)}
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
-                    >
-                      <div className={`p-2 rounded-lg ${item.color} text-white`}>
-                        <item.icon className="w-5 h-5" />
-                      </div>
-                      <span className="font-medium">{item.label}</span>
-                    </button>
-                  ))
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {menuItems.map((item) => (
+                      <button
+                        key={item.type}
+                        onClick={() => handleSelectType(item.type)}
+                        className="flex flex-col gap-2.5 p-4 rounded-[16px] text-left transition-transform active:scale-95 min-h-[92px]"
+                        style={{
+                          background: "var(--surface-2)",
+                          border: "1px solid var(--line)",
+                          color: "var(--ink)",
+                        }}
+                      >
+                        <div
+                          className="w-10 h-10 rounded-[12px] flex items-center justify-center"
+                          style={{ background: "var(--accent)", color: "var(--on-accent)" }}
+                        >
+                          <item.icon className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="text-[15px] font-bold">{item.label}</div>
+                          <div className="text-[12px] mt-0.5" style={{ color: "var(--ink-3)" }}>
+                            {item.desc}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
@@ -134,7 +167,10 @@ export function AddEntityModal({ isOpen, onClose }: AddEntityModalProps) {
       <DialogHeader className="flex flex-row items-center justify-between">
         <div className="flex items-center gap-3">
           {selectedItem && (
-            <div className={`p-2 rounded-lg ${selectedItem.color} text-white`}>
+            <div
+              className="p-2 rounded-lg"
+              style={{ background: "var(--accent)", color: "var(--on-accent)" }}
+            >
               <selectedItem.icon className="w-5 h-5" />
             </div>
           )}
