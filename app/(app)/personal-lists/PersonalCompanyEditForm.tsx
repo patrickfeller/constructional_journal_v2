@@ -15,7 +15,7 @@ interface PersonalCompanyEditFormProps {
 export function PersonalCompanyEditForm({ company }: PersonalCompanyEditFormProps) {
   // TODO: Implement edit functionality
   return (
-    <button className="text-sm text-blue-600 hover:underline">
+    <button className="text-sm text-[var(--accent-deep)] hover:underline">
       Edit
     </button>
   );

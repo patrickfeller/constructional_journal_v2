@@ -62,7 +62,7 @@ export function CompanyEditForm({ company }: CompanyEditFormProps) {
             name="name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="bg-[var(--surface)] border-[var(--line)] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
             placeholder="Company name"
             required
             aria-label="Company name"
@@ -73,7 +73,7 @@ export function CompanyEditForm({ company }: CompanyEditFormProps) {
             name="hourlyRateDefault"
             value={formData.hourlyRateDefault}
             onChange={(e) => setFormData({ ...formData, hourlyRateDefault: e.target.value })}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="bg-[var(--surface)] border-[var(--line)] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
             placeholder="Hourly rate (optional)"
             step="0.01"
             min="0"
@@ -98,7 +98,7 @@ export function CompanyEditForm({ company }: CompanyEditFormProps) {
             size="sm"
             onClick={handleCancel}
             disabled={isPending}
-            className="text-gray-600 hover:text-gray-700"
+            className="text-[var(--ink-2)] hover:text-[var(--ink-2)]"
           >
             Cancel
           </Button>
@@ -112,7 +112,7 @@ export function CompanyEditForm({ company }: CompanyEditFormProps) {
       variant="ghost"
       size="sm"
       onClick={handleEdit}
-      className="text-blue-600 hover:text-blue-700"
+      className="text-[var(--accent-deep)] hover:text-[var(--accent-deep)]"
     >
       Change
     </Button>

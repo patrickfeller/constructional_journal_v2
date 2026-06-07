@@ -63,7 +63,7 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
           name="name"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+          className="bg-[var(--surface)] border-[var(--line)] rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
           required
           aria-label="Project name"
           disabled={isPending}
@@ -74,7 +74,7 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
           value={formData.address}
           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
           placeholder="Full address"
-          className="border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+          className="bg-[var(--surface)] border-[var(--line)] rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
           aria-label="Project address"
           required
           disabled={isPending}
@@ -95,7 +95,7 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
           size="sm"
           onClick={handleCancel}
           disabled={isPending}
-          className="text-gray-600 hover:text-gray-700"
+          className="text-[var(--ink-2)] hover:text-[var(--ink-2)]"
         >
           Cancel
         </Button>
@@ -108,7 +108,7 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
       variant="ghost"
       size="sm"
       onClick={handleEdit}
-      className="text-blue-600 hover:text-blue-700"
+      className="text-[var(--accent-deep)] hover:text-[var(--accent-deep)]"
     >
       Change
     </Button>

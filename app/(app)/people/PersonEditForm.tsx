@@ -69,7 +69,7 @@ export function PersonEditForm({ person, companies }: PersonEditFormProps) {
             name="name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="bg-[var(--surface)] border-[var(--line)] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
             placeholder="Name"
             required
             aria-label="Name"
@@ -79,7 +79,7 @@ export function PersonEditForm({ person, companies }: PersonEditFormProps) {
             name="companyId"
             value={formData.companyId}
             onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+            className="bg-[var(--surface)] border-[var(--line)] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
             aria-label="Company"
             disabled={isPending}
           >
@@ -108,7 +108,7 @@ export function PersonEditForm({ person, companies }: PersonEditFormProps) {
             size="sm"
             onClick={handleCancel}
             disabled={isPending}
-            className="text-gray-600 hover:text-gray-700"
+            className="text-[var(--ink-2)] hover:text-[var(--ink-2)]"
           >
             Cancel
           </Button>
@@ -122,7 +122,7 @@ export function PersonEditForm({ person, companies }: PersonEditFormProps) {
       variant="ghost"
       size="sm"
       onClick={handleEdit}
-      className="text-blue-600 hover:text-blue-700"
+      className="text-[var(--accent-deep)] hover:text-[var(--accent-deep)]"
     >
       Change
     </Button>
