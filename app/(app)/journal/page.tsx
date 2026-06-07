@@ -50,38 +50,37 @@ export default async function JournalListPage() {
     <>
     <AppBar title="Journal" eyebrow="Site log" />
     <main className="p-3 sm:p-6 max-w-5xl mx-auto space-y-4 sm:space-y-6">
-      <h1 className="text-2xl font-semibold">Journal</h1>
-      <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-3 sm:p-4 border border-gray-200 dark:border-gray-800">
+      <section className="rounded-2xl bg-[var(--surface)] shadow-sm p-3 sm:p-4 border border-[var(--line)]">
         <JournalForm projects={projects} today={today} lastUsedProjectId={lastUsedProject?.projectId} />
       </section>
-      <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-3 sm:p-4 border border-gray-200 dark:border-gray-800">
+      <section className="rounded-2xl bg-[var(--surface)] shadow-sm p-3 sm:p-4 border border-[var(--line)]">
         <h2 className="text-lg font-semibold mb-2">Recent entries</h2>
         <ul className="space-y-4 sm:space-y-6">
           {entries.map((e) => (
-            <li key={e.id} className="border rounded-xl p-4 sm:p-6 bg-white dark:bg-gray-800">
+            <li key={e.id} className="border border-[var(--line)] rounded-xl p-4 sm:p-6 bg-[var(--surface)]">
               {/* Header row: Project, Title, Date, and Action Buttons */}
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                  <div className="text-sm text-[var(--ink-2)] mb-1">
                     {e.project.name}
                     {e.author.id !== userId && (
-                      <span className="ml-2 text-blue-600 dark:text-blue-400">
+                      <span className="ml-2 text-[var(--accent-deep)]">
                         by {e.author.name}
                       </span>
                     )}
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white break-words">
+                  <h3 className="text-lg font-semibold break-words">
                     {e.title}
                   </h3>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 sm:ml-4">
                   <div className="text-left sm:text-right">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm text-[var(--ink-2)]">
                       {new Date(e.date).toLocaleDateString()}
                     </div>
                     {/* Weather Display */}
                     {e.weather && typeof e.weather === 'object' && e.weather !== null && (
-                      <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      <div className="flex items-center gap-1 text-xs text-[var(--ink-2)] mt-1">
                         <span>{(e.weather as any).icon || '🌡️'}</span>
                         <span>{(e.weather as any).temperature}°C</span>
                       </div>
@@ -99,11 +98,11 @@ export default async function JournalListPage() {
                 {/* Notes column - takes up less space */}
                 <div className="lg:col-span-3 min-w-0">
                   {e.notes ? (
-                    <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300 break-words">
+                    <div className="prose prose-sm max-w-none break-words">
                       <ReactMarkdown>{e.notes}</ReactMarkdown>
                     </div>
                   ) : (
-                    <div className="text-gray-500 dark:text-gray-400 italic">
+                    <div className="text-[var(--ink-2)] italic">
                       No notes
                     </div>
                   )}
@@ -114,7 +113,7 @@ export default async function JournalListPage() {
                   {e.photos && e.photos.length > 0 ? (
                     <PhotoGrid photos={e.photos} className="mt-0" />
                   ) : (
-                    <div className="text-gray-500 dark:text-gray-400 italic text-sm">
+                    <div className="text-[var(--ink-2)] italic text-sm">
                       No photos
                     </div>
                   )}
