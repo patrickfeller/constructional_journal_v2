@@ -1,103 +1,78 @@
 @import "tailwindcss";
 
-/* Base styles */
-body {
-  @apply bg-white text-gray-900;
+/* ---- Design tokens ---- */
+:root {
+  --bg:          #ECEAE3;
+  --surface:     #FFFFFF;
+  --surface-2:   #F7F5F0;
+  --ink:         #1B1A17;
+  --ink-2:       #57544C;
+  --ink-3:       #8E8A7E;
+  --line:        #E3E0D7;
+  --line-2:      #D5D1C5;
+  --accent:      #F2A20C;
+  --accent-deep: #8A5300;
+  --on-accent:   #1B1A17;
+  --ok:          #3F7D52;
+  --alert:       #C0492F;
+  --shadow:      0 1px 2px rgb(27 26 23 / .06), 0 8px 24px rgb(27 26 23 / .06);
+  --shadow-sm:   0 1px 2px rgb(27 26 23 / .07);
 }
 
-/* Dark mode overrides */
-.dark body {
-  @apply bg-gray-900 text-white;
-}
-
-.dark .bg-card {
-  @apply bg-gray-800;
-}
-
-.dark .text-card-foreground {
-  @apply text-white;
-}
-
-.dark .border {
-  @apply border-gray-700;
-}
-
-.dark .bg-muted {
-  @apply bg-gray-800;
-}
-
-.dark .text-muted-foreground {
-  @apply text-gray-400;
-}
-
-/* Force some basic dark mode styles */
 .dark {
-  color-scheme: dark;
+  --bg:          #131209;
+  --surface:     #201E14;
+  --surface-2:   #2A2719;
+  --ink:         #F3F1E6;
+  --ink-2:       #B6B2A2;
+  --ink-3:       #807C6C;
+  --line:        #36331F;
+  --line-2:      #46422B;
+  --accent:      #F2A20C;
+  --accent-deep: #F2BB4C;
+  --on-accent:   #1B1A17;
+  --ok:          #6CC084;
+  --alert:       #E58368;
+  --shadow:      0 1px 2px rgb(0 0 0 / .4), 0 10px 30px rgb(0 0 0 / .45);
+  --shadow-sm:   0 1px 2px rgb(0 0 0 / .4);
 }
 
-.dark * {
-  border-color: rgb(55 65 81); /* gray-700 */
+/* ---- Base ---- */
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Markdown styling for journal notes - added without breaking Tailwind */
-.prose {
-  line-height: 1.6;
-}
-
+/* ---- Markdown prose (journal notes) ---- */
+.prose { line-height: 1.6; }
 .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
   font-weight: 600;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
 }
-
 .prose h1 { font-size: 1.5em; }
 .prose h2 { font-size: 1.25em; }
 .prose h3 { font-size: 1.125em; }
-
-.prose p {
-  margin-bottom: 1em;
-}
-
-.prose ul, .prose ol {
-  margin-bottom: 1em;
-  padding-left: 1.5em;
-}
-
-.prose li {
-  margin-bottom: 0.25em;
-}
-
-.prose strong {
-  font-weight: 600;
-}
-
-.prose em {
-  font-style: italic;
-}
-
+.prose p  { margin-bottom: 1em; }
+.prose ul, .prose ol { margin-bottom: 1em; padding-left: 1.5em; }
+.prose li { margin-bottom: 0.25em; }
+.prose strong { font-weight: 600; }
+.prose em { font-style: italic; }
 .prose code {
-  background-color: rgb(243 244 246);
+  background-color: var(--surface-2);
   padding: 0.125rem 0.25rem;
   border-radius: 0.25rem;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 0.875em;
 }
-
 .prose blockquote {
-  border-left: 4px solid rgb(209 213 219);
+  border-left: 4px solid var(--line-2);
   padding-left: 1rem;
   margin: 1rem 0;
   font-style: italic;
-  color: rgb(107 114 128);
+  color: var(--ink-3);
 }
-
-/* Dark mode adjustments */
-.dark .prose code {
-  background-color: rgb(55 65 81);
-}
-
-.dark .prose blockquote {
-  border-left-color: rgb(75 85 99);
-  color: rgb(156 163 175);
-}
-
