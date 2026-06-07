@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 export const dynamic = "force-dynamic";
+import { AppBar } from "@/components/AppBar";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { ExpenseForm } from "./ExpenseForm";
@@ -72,6 +73,8 @@ export default async function ExpensesPage() {
   };
 
   return (
+    <>
+    <AppBar title="Expenses" eyebrow="Costs" />
     <main className="p-6 max-w-5xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold">Expenses</h1>
       
@@ -129,6 +132,7 @@ export default async function ExpensesPage() {
         </ul>
       </section>
     </main>
+    </>
   );
 }
 

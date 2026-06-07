@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { createProject, deleteProject } from "./actions";
+import { AppBar } from "@/components/AppBar";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { ProjectEditForm } from "./ProjectEditForm";
@@ -19,6 +20,8 @@ export default async function ProjectsPage() {
   const projects = await getUserAccessibleProjects(userId);
   
   return (
+    <>
+    <AppBar title="Projects" eyebrow="Sites" />
     <main className="p-6 max-w-5xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold">Projects</h1>
       <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-4 border border-gray-200 dark:border-gray-800">
@@ -70,6 +73,7 @@ export default async function ProjectsPage() {
         )}
       </section>
     </main>
+    </>
   );
 }
 

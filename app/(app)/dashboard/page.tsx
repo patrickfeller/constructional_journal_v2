@@ -1,5 +1,6 @@
 
 import { db } from "@/lib/db";
+import { AppBar } from "@/components/AppBar";
 import { DashboardTimeChart, type TimePoint } from "@/components/DashboardTimeChart";
 import { DashboardFilters } from "@/components/DashboardFilters";
 import { getServerSession } from "next-auth";
@@ -134,6 +135,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   });
 
   return (
+    <>
+    <AppBar title="Dashboard" eyebrow="Reports" />
     <main className="p-6 max-w-6xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold">Dashboard</h1>
       
@@ -186,6 +189,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <DashboardTimeChart data={series} />
       </section>
     </main>
+    </>
   );
 }
 

@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { AppBar } from "@/components/AppBar";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { PersonalPersonForm } from "./PersonalPersonForm";
@@ -73,6 +74,8 @@ export default async function PersonalListsPage() {
   }));
 
   return (
+    <>
+    <AppBar title="My Lists" eyebrow="Contacts" />
     <main className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold">Personal Masterlists</h1>
@@ -183,5 +186,6 @@ export default async function PersonalListsPage() {
         </div>
       </div>
     </main>
+    </>
   );
 }

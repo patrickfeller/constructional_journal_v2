@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { AppBar } from "@/components/AppBar";
 import { db } from "@/lib/db";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Mail, Shield, Calendar, FolderOpen, FileText, Timer, Users, Building2 } from "lucide-react";
@@ -54,6 +55,8 @@ export default async function SettingsPage() {
   };
 
   return (
+    <>
+    <AppBar title="Settings" />
     <main className="p-6 max-w-5xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold mb-6">Settings</h1>
       
@@ -233,6 +236,7 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
     </main>
+    </>
   );
 }
 

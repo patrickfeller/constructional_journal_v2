@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 export const dynamic = "force-dynamic";
 import { deleteJournalEntry } from "./actions";
+import { AppBar } from "@/components/AppBar";
 import { PhotoGrid } from "@/components/PhotoGrid";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -46,6 +47,8 @@ export default async function JournalListPage() {
   const today = new Date().toISOString().slice(0, 10);
 
   return (
+    <>
+    <AppBar title="Journal" eyebrow="Site log" />
     <main className="p-3 sm:p-6 max-w-5xl mx-auto space-y-4 sm:space-y-6">
       <h1 className="text-2xl font-semibold">Journal</h1>
       <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-3 sm:p-4 border border-gray-200 dark:border-gray-800">
@@ -122,6 +125,7 @@ export default async function JournalListPage() {
         </ul>
       </section>
     </main>
+    </>
   );
 }
 
