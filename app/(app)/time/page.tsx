@@ -62,8 +62,7 @@ export default async function TimePage() {
     <>
     <AppBar title="Time" eyebrow="Hours" />
     <main className="p-6 max-w-5xl mx-auto space-y-6">
-      <h1 className="text-2xl font-semibold">Time</h1>
-      <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-4 border border-gray-200 dark:border-gray-800">
+      <section className="rounded-2xl bg-[var(--surface)] shadow-sm p-4 border border-[var(--line)]">
         <h2 className="font-medium mb-2">Manual entry</h2>
         <TimeForm projects={projects} people={people} today={today} lastUsedEntry={lastUsedEntry} />
       </section>
@@ -77,7 +76,7 @@ export default async function TimePage() {
                   <div className="font-medium">
                     {t.project.name}
                     {t.owner && t.owner.id !== userId && (
-                      <span className="ml-2 text-blue-600 dark:text-blue-400 text-sm font-normal">
+                      <span className="ml-2 text-[var(--accent-deep)] text-sm font-normal">
                         by {t.owner.name}
                       </span>
                     )}
