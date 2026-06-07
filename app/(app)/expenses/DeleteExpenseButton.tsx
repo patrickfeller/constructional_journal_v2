@@ -60,6 +60,7 @@ export function DeleteExpenseButton({ expenseId, description, amount }: DeleteEx
               </Button>
               <Button
                 type="button"
+                variant="destructive"
                 onClick={handleDelete}
                 loading={isPending}
                 loadingText="Deleting..."
