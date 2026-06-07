@@ -261,7 +261,7 @@ export default async function CompanyDetailPage({ params }: CompanyDetailPagePro
                           href={expense.invoiceUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                          className="text-sm text-[var(--accent-deep)] hover:underline"
                         >
                           View Invoice
                         </a>
