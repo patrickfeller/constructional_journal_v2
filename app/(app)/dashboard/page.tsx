@@ -138,8 +138,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     <>
     <AppBar title="Dashboard" eyebrow="Reports" />
     <main className="p-6 max-w-6xl mx-auto space-y-6">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
-      
       <h2 className="text-lg font-semibold">Time Tracking</h2>
       <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card label="Hours this week" value={toHours(week._sum.durationMinutes)} />
@@ -154,7 +152,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <Card label="Expenses this month" value={formatCurrency(expensesMonth._sum.amount)} />
         <Card label="Total expenses" value={formatCurrency(expensesAll._sum.amount)} />
       </section>
-      <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-6 border border-gray-200 dark:border-gray-800">
+      <section className="rounded-2xl bg-[var(--surface)] shadow-sm p-6 border border-[var(--line)]">
         <h2 className="text-lg font-semibold mb-2">Hours by project</h2>
         <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {hoursByProject.map(h => (
@@ -165,7 +163,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           ))}
         </ul>
       </section>
-      <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-6 border border-gray-200 dark:border-gray-800">
+      <section className="rounded-2xl bg-[var(--surface)] shadow-sm p-6 border border-[var(--line)]">
         <h2 className="text-lg font-semibold mb-2">Expenses by project</h2>
         <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {expensesByProject.map(e => (
@@ -176,7 +174,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           ))}
         </ul>
       </section>
-      <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-6 border border-gray-200 dark:border-gray-800">
+      <section className="rounded-2xl bg-[var(--surface)] shadow-sm p-6 border border-[var(--line)]">
         <h2 className="text-lg font-semibold mb-2">
           Time spent {timeline === "all" ? "(all time)" : `(last ${timeline} days)`}
         </h2>
@@ -195,8 +193,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
 function Card({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-4 border border-gray-200 dark:border-gray-800">
-      <div className="text-sm/6 text-gray-500 dark:text-gray-400">{label}</div>
+    <div className="rounded-2xl bg-[var(--surface)] shadow-sm p-4 border border-[var(--line)]">
+      <div className="text-sm text-[var(--ink-2)]">{label}</div>
       <div className="text-2xl font-semibold">{value}</div>
     </div>
   );
