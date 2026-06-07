@@ -1,22 +1,26 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Archivo, Spline_Sans_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "./(components)/Sidebar";
 import { BottomNav } from "./(components)/BottomNav";
 import { Providers } from "./(components)/providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const archivo = Archivo({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-ui",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const splineSansMono = Spline_Sans_Mono({
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Construction Journal",
+  title: "Constructional Journal",
   description: "Project management and journal application",
 };
 
@@ -28,7 +32,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}
+        className={`${archivo.variable} ${splineSansMono.variable} antialiased min-h-screen`}
+        style={{ fontFamily: "var(--font-ui, system-ui, sans-serif)" }}
       >
         <Providers>
           <div className="md:flex">
