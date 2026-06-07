@@ -17,6 +17,25 @@
   --alert:       #C0492F;
   --shadow:      0 1px 2px rgb(27 26 23 / .06), 0 8px 24px rgb(27 26 23 / .06);
   --shadow-sm:   0 1px 2px rgb(27 26 23 / .07);
+
+  /* Tailwind v4 bridge: maps bg-card, text-muted-foreground, etc. to design tokens */
+  --color-background:              var(--bg);
+  --color-foreground:              var(--ink);
+  --color-card:                    var(--surface);
+  --color-card-foreground:         var(--ink);
+  --color-muted:                   var(--surface-2);
+  --color-muted-foreground:        var(--ink-3);
+  --color-primary:                 var(--accent);
+  --color-primary-foreground:      var(--on-accent);
+  --color-secondary:               var(--surface-2);
+  --color-secondary-foreground:    var(--ink-2);
+  --color-accent:                  var(--surface-2);
+  --color-accent-foreground:       var(--ink);
+  --color-destructive:             var(--alert);
+  --color-destructive-foreground:  #ffffff;
+  --color-border:                  var(--line);
+  --color-input:                   var(--line);
+  --color-ring:                    var(--accent);
 }
 
 .dark {
