@@ -23,34 +23,38 @@ export default async function ProjectsPage() {
     <>
     <AppBar title="Projects" eyebrow="Sites" />
     <main className="p-6 max-w-5xl mx-auto space-y-6">
-      <h1 className="text-2xl font-semibold">Projects</h1>
-      <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-4 border border-gray-200 dark:border-gray-800">
+      <section className="rounded-2xl bg-[var(--surface)] shadow-sm p-4 border border-[var(--line)]">
         <ProjectForm />
       </section>
-      <section className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-4 border border-gray-200 dark:border-gray-800">
+      <section className="rounded-2xl bg-[var(--surface)] shadow-sm p-4 border border-[var(--line)]">
         <h2 className="text-lg font-semibold mb-2">My Projects ({projects.length})</h2>
         <ul className="divide-y">
           {projects.map((p) => (
             <li key={p.id} className="py-3 flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <Link 
+                  <Link
                     href={`/projects/${p.id}`}
-                    className="font-medium hover:text-blue-600 transition-colors"
+                    className="font-medium hover:text-[var(--accent-deep)] transition-colors"
                   >
                     {p.name}
                   </Link>
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    p.role === 'OWNER' ? 'bg-green-100 text-green-800' :
-                    p.role === 'EDITOR' ? 'bg-blue-100 text-blue-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span
+                    className="text-xs px-2 py-1 rounded-full font-medium"
+                    style={
+                      p.role === 'OWNER'
+                        ? { background: 'color-mix(in oklab, var(--ok) 14%, transparent)', color: 'var(--ok)' }
+                        : p.role === 'EDITOR'
+                        ? { background: 'color-mix(in oklab, var(--accent) 14%, transparent)', color: 'var(--accent-deep)' }
+                        : { background: 'var(--surface-2)', color: 'var(--ink-2)' }
+                    }
+                  >
                     {p.role}
                   </span>
                 </div>
-                {p.address ? <div className="text-sm text-gray-500">{p.address}</div> : null}
+                {p.address ? <div className="text-sm text-[var(--ink-2)]">{p.address}</div> : null}
                 {(p.latitude && p.longitude) && (
-                  <div className="text-xs text-gray-400">
+                  <div className="text-xs text-[var(--ink-3)]">
                     📍 {p.latitude.toFixed(4)}, {p.longitude.toFixed(4)}
                   </div>
                 )}
@@ -67,7 +71,7 @@ export default async function ProjectsPage() {
           ))}
         </ul>
         {projects.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-[var(--ink-2)]">
             No projects yet. Create your first project above!
           </div>
         )}
