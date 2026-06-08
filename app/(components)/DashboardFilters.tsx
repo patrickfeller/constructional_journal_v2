@@ -41,74 +41,42 @@ export function DashboardFilters({
     window.open(url, '_blank');
   }
 
+  const selectClass = "border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]";
+
   return (
-    <div className="mb-4 space-y-4">
+    <div className="mb-4 space-y-3">
       <div className="grid gap-2 sm:grid-cols-4">
-        <select
-          aria-label="Filter by project"
-          className="border rounded-md px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
-          value={selected.projectId ?? ""}
-          onChange={(e) => updateParam("projectId", e.target.value)}
-        >
+        <select aria-label="Filter by project" className={selectClass}
+          value={selected.projectId ?? ""} onChange={(e) => updateParam("projectId", e.target.value)}>
           <option value="">All projects</option>
-          {projects.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
+          {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
-        <select
-          aria-label="Filter by person"
-          className="border rounded-md px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
-          value={selected.personId ?? ""}
-          onChange={(e) => updateParam("personId", e.target.value)}
-        >
+        <select aria-label="Filter by person" className={selectClass}
+          value={selected.personId ?? ""} onChange={(e) => updateParam("personId", e.target.value)}>
           <option value="">All people</option>
-          {people.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
+          {people.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
-        <select
-          aria-label="Filter by company"
-          className="border rounded-md px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
-          value={selected.companyId ?? ""}
-          onChange={(e) => updateParam("companyId", e.target.value)}
-        >
+        <select aria-label="Filter by company" className={selectClass}
+          value={selected.companyId ?? ""} onChange={(e) => updateParam("companyId", e.target.value)}>
           <option value="">All companies</option>
-          {companies.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
+          {companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
-        <button
-          type="button"
-          className="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2"
-          onClick={clearAll}
-        >
-          Clear
+        <button type="button" onClick={clearAll}
+          className="rounded-md border border-[var(--line)] bg-[var(--surface-2)] hover:bg-[var(--line)] text-[var(--ink-2)] px-4 py-2 transition-colors">
+          Clear filters
         </button>
       </div>
       <div className="flex gap-2 items-center">
-        <select
-          aria-label="Select timeline"
-          className="border rounded-md px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
-          value={selected.timeline ?? "30"}
-          onChange={(e) => updateParam("timeline", e.target.value)}
-        >
+        <select aria-label="Select timeline" className={selectClass}
+          value={selected.timeline ?? "30"} onChange={(e) => updateParam("timeline", e.target.value)}>
           <option value="7">Last 7 days</option>
           <option value="30">Last 30 days</option>
           <option value="90">Last 90 days</option>
           <option value="365">Last 1 year</option>
           <option value="all">All time</option>
         </select>
-        <button
-          type="button"
-          className="rounded-md bg-green-600 hover:bg-green-700 text-white px-4 py-2"
-          onClick={exportCSV}
-        >
+        <button type="button" onClick={exportCSV}
+          className="rounded-md bg-[var(--accent)] hover:opacity-90 text-[var(--on-accent)] font-semibold px-4 py-2 transition-opacity">
           Export CSV
         </button>
       </div>
