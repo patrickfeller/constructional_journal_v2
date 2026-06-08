@@ -39,7 +39,7 @@ export function TimeForm({ projects, people, today, lastUsedEntry }: TimeFormPro
         name="projectId" 
         aria-label="Project" 
         defaultValue={lastUsedEntry?.projectId || ""} 
-        className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+        className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         required
         disabled={isPending}
       >
@@ -53,7 +53,7 @@ export function TimeForm({ projects, people, today, lastUsedEntry }: TimeFormPro
         name="personId" 
         aria-label="Person" 
         defaultValue={lastUsedEntry?.personId || ""} 
-        className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+        className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         disabled={isPending}
       >
         <option value="">No person</option>
@@ -67,7 +67,7 @@ export function TimeForm({ projects, people, today, lastUsedEntry }: TimeFormPro
         name="date" 
         aria-label="Date" 
         defaultValue={today} 
-        className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+        className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" 
         required 
         disabled={isPending}
       />
@@ -77,7 +77,7 @@ export function TimeForm({ projects, people, today, lastUsedEntry }: TimeFormPro
           type="time" 
           name="start" 
           aria-label="Start time" 
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" 
           required 
           disabled={isPending}
         />
@@ -85,7 +85,7 @@ export function TimeForm({ projects, people, today, lastUsedEntry }: TimeFormPro
           type="time" 
           name="end" 
           aria-label="End time" 
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" 
           required 
           disabled={isPending}
         />
@@ -94,7 +94,7 @@ export function TimeForm({ projects, people, today, lastUsedEntry }: TimeFormPro
           name="breakMinutes" 
           min={0} 
           aria-label="Break minutes" 
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" 
           placeholder="Break (mins)" 
           disabled={isPending}
         />
@@ -103,7 +103,7 @@ export function TimeForm({ projects, people, today, lastUsedEntry }: TimeFormPro
       <input 
         name="notes" 
         placeholder="Notes (optional)" 
-        className="border rounded-md px-3 py-2 sm:col-span-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+        className="border border-[var(--line)] rounded-md px-3 py-2 sm:col-span-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" 
         disabled={isPending}
       />
       
@@ -111,7 +111,7 @@ export function TimeForm({ projects, people, today, lastUsedEntry }: TimeFormPro
         type="submit"
         loading={isPending}
         loadingText="Saving..."
-        className="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2"
+        className="px-4 py-2"
       >
         Save
       </Button>
