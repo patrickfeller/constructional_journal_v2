@@ -6,14 +6,19 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
-  type TooltipProps,
   XAxis,
   YAxis,
 } from "recharts";
 
 export type TimePoint = { date: string; hours: number };
 
-function CustomTooltip({ active, payload, label }: TooltipProps<number, string>) {
+interface TooltipInnerProps {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+}
+
+function CustomTooltip({ active, payload, label }: TooltipInnerProps) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3 py-2 shadow-md text-sm">
