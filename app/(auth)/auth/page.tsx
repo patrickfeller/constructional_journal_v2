@@ -37,7 +37,7 @@ function AuthForm() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           required
         />
         <input
@@ -45,23 +45,23 @@ function AuthForm() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           required
         />
         {error ? <div className="text-sm text-red-600">{error}</div> : null}
         <button
           type="submit"
           disabled={loading}
-          className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white px-4 py-2 w-fit"
+          className="rounded-md bg-[var(--accent)] hover:opacity-90 disabled:opacity-60 text-[var(--on-accent)] font-semibold px-4 py-2 w-fit"
         >
           {loading ? "Signing in..." : "Sign in"}
         </button>
       </form>
-      <p className="text-gray-600 text-sm mt-3">
+      <p className="text-[var(--ink-2)] text-sm mt-3">
         Hint: demo@example.com / demo1234 (from seed)
       </p>
       <div className="text-sm mt-4">
-        New here? <a href="/register" className="text-indigo-600 hover:underline">Create an account</a>
+        New here? <a href="/register" className="text-[var(--accent-deep)] hover:underline">Create an account</a>
       </div>
     </main>
   );
@@ -72,7 +72,7 @@ export default function AuthPage() {
     <Suspense fallback={
       <main className="p-6 max-w-md mx-auto">
         <h1 className="text-2xl font-semibold mb-4">Sign in</h1>
-        <div className="text-gray-600 text-sm">Loading...</div>
+        <div className="text-[var(--ink-2)] text-sm">Loading...</div>
       </main>
     }>
       <AuthForm />

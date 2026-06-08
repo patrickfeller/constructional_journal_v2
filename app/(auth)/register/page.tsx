@@ -39,7 +39,7 @@ function RegisterForm() {
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           required
         />
         <input
@@ -47,7 +47,7 @@ function RegisterForm() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           required
         />
         <input
@@ -55,7 +55,7 @@ function RegisterForm() {
           placeholder="Password (min 6 chars)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           required
           minLength={6}
         />
@@ -63,13 +63,13 @@ function RegisterForm() {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white px-4 py-2 w-fit"
+          className="rounded-md bg-[var(--accent)] hover:opacity-90 disabled:opacity-60 text-[var(--on-accent)] font-semibold px-4 py-2 w-fit"
         >
           {loading ? "Creating..." : "Create account"}
         </button>
       </form>
       <div className="text-sm mt-4">
-        Already have an account? <a href="/auth" className="text-indigo-600 hover:underline">Sign in</a>
+        Already have an account? <a href="/auth" className="text-[var(--accent-deep)] hover:underline">Sign in</a>
       </div>
     </main>
   );
@@ -80,7 +80,7 @@ export default function RegisterPage() {
     <Suspense fallback={
       <main className="p-6 max-w-md mx-auto">
         <h1 className="text-2xl font-semibold mb-4">Create account</h1>
-        <div className="text-gray-600 text-sm">Loading...</div>
+        <div className="text-[var(--ink-2)] text-sm">Loading...</div>
       </main>
     }>
       <RegisterForm />
