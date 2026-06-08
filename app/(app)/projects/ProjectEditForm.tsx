@@ -63,7 +63,7 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
           name="name"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="bg-[var(--surface)] border-[var(--line)] rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          className="border border-[var(--line)] rounded-md px-2 py-1 text-sm bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           required
           aria-label="Project name"
           disabled={isPending}
@@ -74,7 +74,7 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
           value={formData.address}
           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
           placeholder="Full address"
-          className="bg-[var(--surface)] border-[var(--line)] rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          className="border border-[var(--line)] rounded-md px-2 py-1 text-sm bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           aria-label="Project address"
           required
           disabled={isPending}

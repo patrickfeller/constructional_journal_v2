@@ -19,7 +19,7 @@ export function ProjectForm() {
         <input
           name="name"
           placeholder="Project name"
-          className="bg-[var(--surface)] border-[var(--line)] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           required
           disabled={isPending}
         />
@@ -27,7 +27,7 @@ export function ProjectForm() {
           <input
             name="address"
             placeholder="Full address"
-            className="bg-[var(--surface)] border-[var(--line)] rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="border border-[var(--line)] rounded-md px-3 py-2 w-full bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
             required
             disabled={isPending}
           />
