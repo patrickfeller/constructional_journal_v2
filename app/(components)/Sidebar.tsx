@@ -4,11 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Home, BookText, Timer, BarChart3, Settings,
-  UserCog, ReceiptEuro, Folder, LogOut, Sun, Moon,
+  UserCog, ReceiptEuro, Folder, LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession, signOut } from "next-auth/react";
-import { useTheme } from "next-themes";
 
 const links = [
   { href: "/",               label: "Home",       Icon: Home        },
@@ -24,7 +23,6 @@ const links = [
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { theme, setTheme } = useTheme();
 
   return (
     <aside
@@ -64,41 +62,24 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="px-3 py-3 border-t" style={{ borderColor: "var(--line)" }}>
-        <div className="flex items-center justify-between gap-2">
+        {session?.user ? (
           <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="flex items-center gap-2 px-3 py-2 rounded-[11px] text-sm transition-colors"
-            style={{ color: "var(--ink-2)" }}
+            onClick={() => signOut({ callbackUrl: "/auth" })}
+            className="flex items-center gap-1.5 text-xs transition-colors px-3 py-2"
+            style={{ color: "var(--ink-3)" }}
           >
-            {theme === "dark" ? (
-              <Sun className="w-4 h-4" />
-            ) : (
-              <Moon className="w-4 h-4" />
-            )}
-            <span className="font-mono text-[11px] tracking-wide uppercase">
-              {theme === "dark" ? "Light" : "Dark"}
-            </span>
+            <LogOut className="w-3.5 h-3.5" />
+            Sign out
           </button>
-
-          {session?.user ? (
-            <button
-              onClick={() => signOut({ callbackUrl: "/auth" })}
-              className="flex items-center gap-1.5 text-xs transition-colors"
-              style={{ color: "var(--ink-3)" }}
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              Sign out
-            </button>
-          ) : (
-            <Link
-              href="/auth"
-              className="text-xs"
-              style={{ color: "var(--ink-3)" }}
-            >
-              Sign in
-            </Link>
-          )}
-        </div>
+        ) : (
+          <Link
+            href="/auth"
+            className="text-xs px-3 py-2"
+            style={{ color: "var(--ink-3)" }}
+          >
+            Sign in
+          </Link>
+        )}
       </div>
     </aside>
   );
