@@ -102,7 +102,7 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
           aria-label="Project" 
           value={selectedProjectId}
           onChange={(e) => setSelectedProjectId(e.target.value)}
-          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400 w-full"
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] w-full"
           required
           disabled={isPending}
         >
@@ -117,14 +117,14 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
           aria-label="Date"
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}
-          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400 w-full" 
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] w-full" 
           required 
           disabled={isPending}
         />
         <input 
           name="title" 
           placeholder="Title"
-          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400 w-full" 
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] w-full" 
           required 
           disabled={isPending}
         />
@@ -133,7 +133,7 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
         name="notes" 
         aria-label="Notes" 
         placeholder="Notes (Markdown supported)"
-        className="border border-[var(--line)] rounded-md px-3 py-2 min-h-[100px] bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400 w-full" 
+        className="border border-[var(--line)] rounded-md px-3 py-2 min-h-[100px] bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] w-full" 
         disabled={isPending}
       />
       
@@ -165,12 +165,12 @@ export function JournalForm({ projects, today, lastUsedProjectId }: JournalFormP
           accept="image/*" 
           multiple 
           onChange={(e) => e.target.files && handlePhotoUpload(e.target.files)}
-          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400 w-full"
+          className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] w-full"
           disabled={isPending || uploading}
         />
         {uploading && <div className="text-sm text-[var(--ink-2)]">Uploading photos...</div>}
         {uploadedUrls.length > 0 && (
-          <div className="text-sm text-green-600">
+          <div className="text-sm text-[var(--ok)]">
             {uploadedUrls.length} photo(s) uploaded successfully
           </div>
         )}

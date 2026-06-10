@@ -46,8 +46,8 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
         ref={dialogRef}
         className={cn(
           "relative z-50 w-full max-w-lg max-h-[90vh] overflow-y-auto",
-          "bg-white dark:bg-gray-900 rounded-2xl shadow-2xl",
-          "border border-gray-200 dark:border-gray-800",
+          "bg-[var(--surface)] text-[var(--ink)] rounded-2xl shadow-[var(--shadow)]",
+          "border border-[var(--line)]",
           "animate-in zoom-in-95 duration-200",
           className
         )}
@@ -60,7 +60,7 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
 
 export function DialogHeader({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("px-6 py-4 border-b border-gray-200 dark:border-gray-800", className)}>
+    <div className={cn("px-6 py-4 border-b border-[var(--line)]", className)}>
       {children}
     </div>
   );

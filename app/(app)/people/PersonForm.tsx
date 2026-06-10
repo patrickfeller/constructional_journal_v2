@@ -28,7 +28,7 @@ export function PersonForm({ companies }: PersonFormProps) {
         name="name" 
         aria-label="Name" 
         placeholder="Name" 
-        className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800" 
+        className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         required 
         disabled={isPending}
       />
@@ -36,7 +36,7 @@ export function PersonForm({ companies }: PersonFormProps) {
       <select 
         name="companyId" 
         aria-label="Company" 
-        className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-950 dark:border-gray-800"
+        className="border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         disabled={isPending}
       >
         <option value="">No company</option>
@@ -45,11 +45,11 @@ export function PersonForm({ companies }: PersonFormProps) {
         ))}
       </select>
       
-      <Button 
+      <Button
         type="submit"
         loading={isPending}
         loadingText="Saving..."
-        className="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2"
+        className="rounded-md px-4 py-2"
       >
         Save
       </Button>

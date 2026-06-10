@@ -89,7 +89,7 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
           <select
             name="projectId"
             aria-label="Project"
-            className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
             required
             disabled={isPending}
           >
@@ -110,7 +110,7 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
             step="0.01"
             min="0"
             placeholder="0.00"
-            className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
             required
             disabled={isPending}
           />
@@ -123,7 +123,7 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
           name="description"
           rows={3}
           placeholder="What was this expense for?"
-          className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           required
           disabled={isPending}
         />
@@ -142,7 +142,7 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
           onFocus={() => setShowSuggestions(true)}
           placeholder="Select or type company name"
           aria-label="Company name"
-          className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           required
           disabled={isPending}
         />
@@ -170,7 +170,7 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
             name="date"
             defaultValue={today}
             aria-label="Expense date"
-            className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="w-full border border-[var(--line)] rounded-md px-3 py-2 bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
             required
             disabled={isPending}
           />
@@ -200,7 +200,7 @@ export function ExpenseForm({ projects, companies, today }: ExpenseFormProps) {
             </label>
           </div>
           {uploadedFile && (
-            <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+            <p className="text-xs text-[var(--ok)] mt-1">
               File uploaded successfully
             </p>
           )}

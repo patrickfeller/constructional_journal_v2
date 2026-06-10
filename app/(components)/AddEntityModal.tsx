@@ -178,7 +178,7 @@ export function AddEntityModal({ isOpen, onClose }: AddEntityModalProps) {
         </div>
         <button
           onClick={handleBack}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+          className="p-2 hover:bg-[var(--surface-2)] rounded-lg transition-colors"
           aria-label="Back to menu"
         >
           <X className="w-5 h-5" />
